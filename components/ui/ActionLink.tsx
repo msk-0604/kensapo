@@ -1,0 +1,48 @@
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+
+type Variant = "primary" | "secondary";
+
+const variants: Record<Variant, string> = {
+  primary:
+    "bg-navy-900 text-white hover:bg-navy-800 active:bg-navy-950 border-2 border-navy-900",
+  secondary:
+    "bg-white text-navy-900 border-2 border-gray-300 hover:bg-gray-50 active:bg-gray-100",
+};
+
+export function ActionLink({
+  href,
+  children,
+  variant = "primary",
+  description,
+  className,
+}: {
+  href: string;
+  children: React.ReactNode;
+  variant?: Variant;
+  description?: string;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        "flex min-h-[4.5rem] w-full flex-col items-center justify-center gap-1 rounded-2xl px-6 py-5 text-center transition-colors",
+        variants[variant],
+        className
+      )}
+    >
+      <span className="text-xl font-bold leading-snug">{children}</span>
+      {description ? (
+        <span
+          className={cn(
+            "text-base font-normal leading-snug",
+            variant === "primary" ? "text-white/85" : "text-gray-600"
+          )}
+        >
+          {description}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
