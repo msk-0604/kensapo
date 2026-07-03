@@ -1,7 +1,39 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { applySecurityHeaders } from "@/lib/security/headers";
-import { getSupabasePublicEnv } from "@/lib/supabase/env";
+
+/**
+ * Edge Runtime 専用の Supabase セッション更新。
+ * Node.js API（fs / path / crypto / node:*）は使用しない。
+ * @/ エイリアスも使わない（Vercel Edge バンドラ対応）。
+ */
+
+const SECURITY_HEADERS: Record<string, string> = {
+  "X-Frame-Options": "DENY",
+  "X-Content-Type-Options": "nosniff",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Permissions-Policy": "camera=(self), microphone=(), geolocation=()",
+  "X-DNS-Prefetch-Control": "off",
+};
+
+function applySecurityHeaders(response: NextResponse): NextResponse {
+  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+    response.headers.set(key, value);
+  }
+  return response;
+}
+
+function getSupabasePublicEnv():
+  | { url: string; anonKey: string }
+  | { error: true } {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+
+  if (!url || !anonKey) {
+    return { error: true };
+  }
+
+  return { url, anonKey };
+}
 
 export async function updateSession(request: NextRequest) {
   const env = getSupabasePublicEnv();
@@ -55,7 +87,10 @@ export async function updateSession(request: NextRequest) {
       request.method === "POST" &&
       !user
     ) {
-      const denied = NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      const denied = NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
       return applySecurityHeaders(denied);
     }
     return applySecurityHeaders(supabaseResponse);
