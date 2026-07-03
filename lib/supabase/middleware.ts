@@ -1,10 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabasePublicEnv } from "./env";
 
 /**
  * Edge Runtime 専用の Supabase セッション更新。
  * Node.js API（fs / path / crypto / node:*）は使用しない。
- * @/ エイリアスも使わない（Vercel Edge バンドラ対応）。
+ * @/ エイリアスは使わない（Vercel Edge バンドラ対応）。
  */
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -22,24 +23,11 @@ function applySecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-function getSupabasePublicEnv():
-  | { url: string; anonKey: string }
-  | { error: true } {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
-
-  if (!url || !anonKey) {
-    return { error: true };
-  }
-
-  return { url, anonKey };
-}
-
 export async function updateSession(request: NextRequest) {
   const env = getSupabasePublicEnv();
   const pathname = request.nextUrl.pathname;
 
-  if ("error" in env) {
+  if (!env) {
     if (pathname === "/setup") {
       return applySecurityHeaders(NextResponse.next({ request }));
     }
