@@ -31,7 +31,8 @@ lib/
 supabase/migrations/
   001_initial_schema.sql
   002_security_hardening.sql
-  003_starkworks_features.sql   # ★新規：作業員・予定・拡張カラム
+  003_starkworks_features.sql   # 作業員・予定
+  004_progress_and_schedule.sql # ★工事進行チェック・行動予定拡張
 ```
 
 ## DB 設計（Supabase）

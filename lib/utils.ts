@@ -15,6 +15,23 @@ export function todayISO(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+export function formatTime(time: string | null | undefined): string {
+  if (!time) return "";
+  return time.slice(0, 5);
+}
+
+export function formatDateTimeTime(iso: string | null | undefined): string {
+  if (!iso) return "";
+  return new Date(iso).toLocaleTimeString("ja-JP", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+export function nowISO(): string {
+  return new Date().toISOString();
+}
+
 export function addDaysISO(date: string, days: number): string {
   const d = new Date(`${date}T12:00:00`);
   d.setDate(d.getDate() + days);

@@ -1,6 +1,12 @@
 export type ProjectStatus = "not_started" | "in_progress" | "completed";
 export type WorkerStatus = "active" | "inactive";
 export type ReportStatus = "draft" | "submitted";
+export type ScheduleStatus =
+  | "scheduled"
+  | "in_progress"
+  | "completed"
+  | "cancelled";
+export type ProgressItemStatus = "pending" | "completed";
 
 export interface Company {
   id: string;
@@ -46,10 +52,36 @@ export interface Schedule {
   id: string;
   company_id: string;
   project_id: string;
-  worker_id: string;
+  worker_id: string | null;
   schedule_date: string;
+  client_company_name: string | null;
+  location: string | null;
+  title: string | null;
   work_content: string | null;
+  scheduled_start_time: string | null;
+  scheduled_end_time: string | null;
+  actual_start_time: string | null;
+  actual_end_time: string | null;
+  memo: string | null;
+  status: ScheduleStatus;
   created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectProgressItem {
+  id: string;
+  company_id: string;
+  project_id: string;
+  category: string;
+  section: string | null;
+  item_name: string;
+  status: ProgressItemStatus;
+  checked: boolean;
+  checked_at: string | null;
+  checked_by: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface SitePhoto {

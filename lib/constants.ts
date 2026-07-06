@@ -1,4 +1,11 @@
-import type { ProjectStatus, WorkerStatus } from "@/types/database";
+import type { ProjectStatus, ScheduleStatus, WorkerStatus } from "@/types/database";
+
+export const SCHEDULE_STATUS_LABELS: Record<ScheduleStatus, string> = {
+  scheduled: "予定",
+  in_progress: "作業中",
+  completed: "完了",
+  cancelled: "取消",
+};
 
 export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   not_started: "予定",

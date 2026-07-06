@@ -48,7 +48,7 @@ export default async function SchedulePage({
   return (
     <>
       <PageHeader
-        title="作業員予定"
+        title="今日の行動予定"
         description={
           isToday
             ? `今日（${formatDate(selectedDate)}）の予定`
@@ -57,6 +57,14 @@ export default async function SchedulePage({
         backHref="/dashboard"
         backLabel="ホームに戻る"
       />
+
+      <section className="mb-6">
+        <Link href="/schedule/new">
+          <Button fullWidth size="md">
+            新しい予定を追加する
+          </Button>
+        </Link>
+      </section>
 
       <ScheduleWeekNav
         selectedDate={selectedDate}
@@ -72,30 +80,23 @@ export default async function SchedulePage({
         </Link>
       </section>
 
-      {schedules.length === 0 && activeWorkers.length > 0 && projects.length > 0 ? (
+      {schedules.length === 0 && projects.length > 0 ? (
         <EmptyState
           title={
             isToday ? "今日の予定はまだありません" : "この日の予定はありません"
           }
-          description="下のフォームから、誰がどの現場に行くか登録できます。"
+          description="上のボタンから、行動予定を登録できます。"
         />
       ) : null}
 
-      {activeWorkers.length === 0 || projects.length === 0 ? (
+      {projects.length === 0 ? (
         <EmptyState
           title="予定を登録する準備ができていません"
-          description="作業員と現場を先に登録してください。"
+          description="現場を先に登録してください。"
           action={
-            <div className="grid gap-3">
-              <Link href="/workers/new">
-                <Button fullWidth>作業員を登録する</Button>
-              </Link>
-              <Link href="/sites/new">
-                <Button variant="secondary" fullWidth>
-                  現場を登録する
-                </Button>
-              </Link>
-            </div>
+            <Link href="/sites/new">
+              <Button fullWidth>現場を登録する</Button>
+            </Link>
           }
         />
       ) : (

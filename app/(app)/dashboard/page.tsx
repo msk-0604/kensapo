@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProgressCharts } from "@/components/dashboard/ProgressCharts";
+import { DashboardTodaySchedules } from "@/components/dashboard/DashboardTodaySchedules";
+import { DashboardSiteProgress } from "@/components/dashboard/DashboardSiteProgress";
 import { getSites } from "@/lib/sites";
 import { getDashboardStats } from "@/lib/dashboard";
 import { getProgressChartData } from "@/lib/progress";
@@ -73,7 +75,51 @@ export default async function DashboardPage() {
                 </p>
                 <p className="mt-1 text-base text-gray-500">件</p>
               </Card>
+              {stats.pendingChecklistCount > 0 ? (
+                <Card className="!p-5 text-center col-span-2">
+                  <p className="text-base font-bold text-gray-600">
+                    未完了チェック
+                  </p>
+                  <p className="mt-2 text-4xl font-bold text-amber-700">
+                    {stats.pendingChecklistCount}
+                  </p>
+                  <p className="mt-1 text-base text-gray-500">件</p>
+                </Card>
+              ) : null}
             </section>
+          ) : null}
+
+          {stats && stats.inProgressSchedules.length > 0 ? (
+            <section className="mb-8">
+              <h2 className="mb-4 text-lg font-bold text-gray-800">
+                進行中の作業
+              </h2>
+              <ul className="space-y-3">
+                {stats.inProgressSchedules.map((s) => (
+                  <li key={s.id}>
+                    <Card className="!p-4">
+                      <p className="font-bold text-navy-950">
+                        {s.title || s.project_name}
+                      </p>
+                      <p className="mt-1 text-base text-green-800">
+                        作業中
+                        {s.work_content ? ` — ${s.work_content}` : ""}
+                      </p>
+                    </Card>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {stats ? (
+            <DashboardTodaySchedules schedules={stats.todaySchedules} />
+          ) : null}
+
+          {stats ? (
+            <DashboardSiteProgress
+              summaries={stats.siteProgressSummaries}
+            />
           ) : null}
 
           {progressData ? <ProgressCharts data={progressData} /> : null}

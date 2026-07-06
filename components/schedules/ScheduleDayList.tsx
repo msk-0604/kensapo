@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
 import { ScheduleForm } from "@/components/schedules/ScheduleForm";
+import { ScheduleCard } from "@/components/schedules/ScheduleCard";
 import type { Project, Worker } from "@/types/database";
 import type { ScheduleWithDetails } from "@/lib/schedules";
 
@@ -58,40 +57,15 @@ export function ScheduleDayList({
   return (
     <section className="mb-8">
       {schedules.length > 0 ? (
-        <ul className="mb-8 space-y-3">
+        <ul className="mb-8 space-y-4">
           {schedules.map((s) => (
             <li key={s.id}>
-              <Card className="!p-5">
-                <p className="text-lg font-bold text-navy-950">
-                  {s.worker_name} → {s.project_name}
-                </p>
-                {s.work_content ? (
-                  <p className="mt-2 text-base text-gray-600">
-                    {s.work_content}
-                  </p>
-                ) : null}
-                <div className="mt-4 grid grid-cols-2 gap-3">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="md"
-                    fullWidth
-                    onClick={() => setEditing(s)}
-                  >
-                    変更
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    size="md"
-                    fullWidth
-                    loading={deletingId === s.id}
-                    onClick={() => handleDelete(s.id)}
-                  >
-                    削除
-                  </Button>
-                </div>
-              </Card>
+              <ScheduleCard
+                schedule={s}
+                onEdit={() => setEditing(s)}
+                onDelete={() => handleDelete(s.id)}
+                deleting={deletingId === s.id}
+              />
             </li>
           ))}
         </ul>

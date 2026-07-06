@@ -3,9 +3,39 @@ import type { Schedule } from "@/types/database";
 import { todayISO } from "@/lib/utils";
 
 export type ScheduleWithDetails = Schedule & {
-  worker_name: string;
+  worker_name: string | null;
   project_name: string;
 };
+
+function mapScheduleRow(
+  row: Schedule & {
+    workers: { name: string } | null;
+    projects: { name: string };
+  }
+): ScheduleWithDetails {
+  return {
+    ...row,
+    worker_id: row.worker_id,
+    client_company_name: row.client_company_name ?? null,
+    location: row.location ?? null,
+    title: row.title ?? null,
+    scheduled_start_time: row.scheduled_start_time ?? null,
+    scheduled_end_time: row.scheduled_end_time ?? null,
+    actual_start_time: row.actual_start_time ?? null,
+    actual_end_time: row.actual_end_time ?? null,
+    memo: row.memo ?? null,
+    status: row.status ?? "scheduled",
+    updated_at: row.updated_at ?? row.created_at,
+    worker_name: row.workers?.name ?? null,
+    project_name: row.projects.name,
+  };
+}
+
+const SCHEDULE_SELECT = `
+  *,
+  workers(name),
+  projects!inner(name)
+`;
 
 export async function getSchedulesForDate(
   date: string = todayISO()
@@ -13,29 +43,21 @@ export async function getSchedulesForDate(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("schedules")
-    .select(
-      `
-      *,
-      workers!inner(name),
-      projects!inner(name)
-    `
-    )
+    .select(SCHEDULE_SELECT)
     .eq("schedule_date", date)
+    .order("scheduled_start_time", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true });
 
   if (error) throw error;
 
-  return (data ?? []).map((row) => {
-    const r = row as Schedule & {
-      workers: { name: string };
-      projects: { name: string };
-    };
-    return {
-      ...r,
-      worker_name: r.workers.name,
-      project_name: r.projects.name,
-    };
-  });
+  return (data ?? []).map((row) =>
+    mapScheduleRow(
+      row as Schedule & {
+        workers: { name: string } | null;
+        projects: { name: string };
+      }
+    )
+  );
 }
 
 export async function getUpcomingSchedules(
@@ -45,30 +67,22 @@ export async function getUpcomingSchedules(
   const today = todayISO();
   const { data, error } = await supabase
     .from("schedules")
-    .select(
-      `
-      *,
-      workers!inner(name),
-      projects!inner(name)
-    `
-    )
+    .select(SCHEDULE_SELECT)
     .gte("schedule_date", today)
     .order("schedule_date", { ascending: true })
+    .order("scheduled_start_time", { ascending: true, nullsFirst: false })
     .limit(limit);
 
   if (error) throw error;
 
-  return (data ?? []).map((row) => {
-    const r = row as Schedule & {
-      workers: { name: string };
-      projects: { name: string };
-    };
-    return {
-      ...r,
-      worker_name: r.workers.name,
-      project_name: r.projects.name,
-    };
-  });
+  return (data ?? []).map((row) =>
+    mapScheduleRow(
+      row as Schedule & {
+        workers: { name: string } | null;
+        projects: { name: string };
+      }
+    )
+  );
 }
 
 export async function getSchedulesForRange(
@@ -78,31 +92,23 @@ export async function getSchedulesForRange(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("schedules")
-    .select(
-      `
-      *,
-      workers!inner(name),
-      projects!inner(name)
-    `
-    )
+    .select(SCHEDULE_SELECT)
     .gte("schedule_date", startDate)
     .lte("schedule_date", endDate)
     .order("schedule_date", { ascending: true })
+    .order("scheduled_start_time", { ascending: true, nullsFirst: false })
     .order("created_at", { ascending: true });
 
   if (error) throw error;
 
-  return (data ?? []).map((row) => {
-    const r = row as Schedule & {
-      workers: { name: string };
-      projects: { name: string };
-    };
-    return {
-      ...r,
-      worker_name: r.workers.name,
-      project_name: r.projects.name,
-    };
-  });
+  return (data ?? []).map((row) =>
+    mapScheduleRow(
+      row as Schedule & {
+        workers: { name: string } | null;
+        projects: { name: string };
+      }
+    )
+  );
 }
 
 export function countSchedulesByDate(
@@ -123,13 +129,7 @@ export async function getSchedulesForProject(
   const start = fromDate ?? todayISO();
   const { data, error } = await supabase
     .from("schedules")
-    .select(
-      `
-      *,
-      workers!inner(name),
-      projects!inner(name)
-    `
-    )
+    .select(SCHEDULE_SELECT)
     .eq("project_id", projectId)
     .gte("schedule_date", start)
     .order("schedule_date", { ascending: true })
@@ -137,15 +137,36 @@ export async function getSchedulesForProject(
 
   if (error) throw error;
 
-  return (data ?? []).map((row) => {
-    const r = row as Schedule & {
-      workers: { name: string };
-      projects: { name: string };
-    };
-    return {
-      ...r,
-      worker_name: r.workers.name,
-      project_name: r.projects.name,
-    };
-  });
+  return (data ?? []).map((row) =>
+    mapScheduleRow(
+      row as Schedule & {
+        workers: { name: string } | null;
+        projects: { name: string };
+      }
+    )
+  );
+}
+
+export async function getInProgressSchedulesForToday(): Promise<
+  ScheduleWithDetails[]
+> {
+  const supabase = await createClient();
+  const today = todayISO();
+  const { data, error } = await supabase
+    .from("schedules")
+    .select(SCHEDULE_SELECT)
+    .eq("schedule_date", today)
+    .eq("status", "in_progress")
+    .order("scheduled_start_time", { ascending: true });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row) =>
+    mapScheduleRow(
+      row as Schedule & {
+        workers: { name: string } | null;
+        projects: { name: string };
+      }
+    )
+  );
 }

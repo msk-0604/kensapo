@@ -8,6 +8,7 @@ import { Input, Select, Textarea } from "@/components/ui/Input";
 import { PROJECT_STATUS_LABELS } from "@/lib/constants";
 import { LIMITS } from "@/lib/security/validation";
 import { createClient } from "@/lib/supabase/client";
+import { seedProgressItemsClient } from "@/components/progress/SeedProgressButton";
 
 type Props = {
   project?: Project;
@@ -76,6 +77,11 @@ export function ProjectForm({ project, companyId }: Props) {
           .select()
           .single();
         if (insertError) throw insertError;
+        try {
+          await seedProgressItemsClient(data.id, companyId);
+        } catch {
+          // マイグレーション未適用時はスキップ
+        }
         router.push(`/sites/${data.id}`);
       }
       router.refresh();

@@ -31,7 +31,13 @@ export function ScheduleForm({
     schedule_date: schedule?.schedule_date ?? defaultDate ?? todayISO(),
     project_id: schedule?.project_id ?? projects[0]?.id ?? "",
     worker_id: schedule?.worker_id ?? workers[0]?.id ?? "",
+    client_company_name: schedule?.client_company_name ?? "",
+    location: schedule?.location ?? "",
+    title: schedule?.title ?? "",
     work_content: schedule?.work_content ?? "",
+    scheduled_start_time: schedule?.scheduled_start_time?.slice(0, 5) ?? "08:30",
+    scheduled_end_time: schedule?.scheduled_end_time?.slice(0, 5) ?? "17:00",
+    memo: schedule?.memo ?? "",
   });
 
   useEffect(() => {
@@ -44,10 +50,7 @@ export function ScheduleForm({
     if (projects.length && !form.project_id) {
       setForm((f) => ({ ...f, project_id: projects[0].id }));
     }
-    if (workers.length && !form.worker_id) {
-      setForm((f) => ({ ...f, worker_id: workers[0].id }));
-    }
-  }, [projects, workers, form.project_id, form.worker_id]);
+  }, [projects, form.project_id]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,9 +60,16 @@ export function ScheduleForm({
 
     const payload = {
       project_id: form.project_id,
-      worker_id: form.worker_id,
+      worker_id: form.worker_id || null,
       schedule_date: form.schedule_date,
+      client_company_name: form.client_company_name.trim() || null,
+      location: form.location.trim() || null,
+      title: form.title.trim() || null,
       work_content: form.work_content.trim() || null,
+      scheduled_start_time: form.scheduled_start_time || null,
+      scheduled_end_time: form.scheduled_end_time || null,
+      memo: form.memo.trim() || null,
+      updated_at: new Date().toISOString(),
     };
 
     const { error: saveError } = schedule
@@ -70,6 +80,7 @@ export function ScheduleForm({
       : await supabase.from("schedules").insert({
           ...payload,
           company_id: companyId,
+          status: "scheduled",
         });
 
     setLoading(false);
@@ -78,17 +89,15 @@ export function ScheduleForm({
       return;
     }
 
-    if (onCancel) {
-      onCancel();
-    }
+    if (onCancel) onCancel();
     router.push(`/schedule?date=${form.schedule_date}`);
     router.refresh();
   }
 
-  if (workers.length === 0 || projects.length === 0) {
+  if (projects.length === 0) {
     return (
       <p className="text-lg text-gray-600">
-        予定を登録するには、先に作業員と現場を登録してください。
+        予定を登録するには、先に現場を登録してください。
       </p>
     );
   }
@@ -102,8 +111,28 @@ export function ScheduleForm({
         onChange={(e) => setForm({ ...form, schedule_date: e.target.value })}
         required
       />
+      <Input
+        label="会社名（任意）"
+        value={form.client_company_name}
+        onChange={(e) =>
+          setForm({ ...form, client_company_name: e.target.value })
+        }
+        placeholder="例：○○建設"
+      />
+      <Input
+        label="場所（任意）"
+        value={form.location}
+        onChange={(e) => setForm({ ...form, location: e.target.value })}
+        placeholder="例：東京都世田谷区"
+      />
+      <Input
+        label="現場名・タイトル（任意）"
+        value={form.title}
+        onChange={(e) => setForm({ ...form, title: e.target.value })}
+        placeholder="例：○○様邸"
+      />
       <Select
-        label="現場"
+        label="現場（必須）"
         value={form.project_id}
         onChange={(e) => setForm({ ...form, project_id: e.target.value })}
       >
@@ -113,23 +142,51 @@ export function ScheduleForm({
           </option>
         ))}
       </Select>
-      <Select
-        label="作業員"
-        value={form.worker_id}
-        onChange={(e) => setForm({ ...form, worker_id: e.target.value })}
-      >
-        {workers.map((w) => (
-          <option key={w.id} value={w.id}>
-            {w.name}
-          </option>
-        ))}
-      </Select>
       <Textarea
-        label="作業内容（任意）"
+        label="作業内容"
         value={form.work_content}
         onChange={(e) => setForm({ ...form, work_content: e.target.value })}
         rows={3}
-        placeholder="例：外壁の足場組み立て"
+        placeholder="例：給水配管施工"
+        required
+      />
+      {workers.length > 0 ? (
+        <Select
+          label="担当作業員（任意）"
+          value={form.worker_id}
+          onChange={(e) => setForm({ ...form, worker_id: e.target.value })}
+        >
+          <option value="">未指定</option>
+          {workers.map((w) => (
+            <option key={w.id} value={w.id}>
+              {w.name}
+            </option>
+          ))}
+        </Select>
+      ) : null}
+      <div className="grid grid-cols-2 gap-3">
+        <Input
+          label="開始予定"
+          type="time"
+          value={form.scheduled_start_time}
+          onChange={(e) =>
+            setForm({ ...form, scheduled_start_time: e.target.value })
+          }
+        />
+        <Input
+          label="終了予定"
+          type="time"
+          value={form.scheduled_end_time}
+          onChange={(e) =>
+            setForm({ ...form, scheduled_end_time: e.target.value })
+          }
+        />
+      </div>
+      <Textarea
+        label="メモ（任意）"
+        value={form.memo}
+        onChange={(e) => setForm({ ...form, memo: e.target.value })}
+        rows={2}
       />
       {error ? (
         <p className="rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3 text-base text-red-700">
@@ -142,7 +199,7 @@ export function ScheduleForm({
             やめる
           </Button>
         ) : null}
-        <Button type="submit" fullWidth loading={loading} className={onCancel ? "" : ""}>
+        <Button type="submit" fullWidth loading={loading}>
           {loading
             ? "保存しています"
             : schedule

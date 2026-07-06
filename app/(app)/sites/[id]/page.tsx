@@ -6,9 +6,12 @@ import { Button } from "@/components/ui/Button";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { StatusBadge } from "@/components/ui/Badge";
 import { SiteProgressBar } from "@/components/sites/SiteProgressBar";
+import { SeedProgressButton } from "@/components/progress/SeedProgressButton";
 import { getSite } from "@/lib/sites";
 import { getSchedulesForProject } from "@/lib/schedules";
+import { getProgressItems, getProgressSummary } from "@/lib/progress-checklist";
 import { getSiteProgressPercent } from "@/lib/progress";
+import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 
@@ -21,6 +24,7 @@ export default async function SiteDetailPage({
   const site = await getSite(id);
   if (!site) notFound();
 
+  const profile = await getProfile();
   const supabase = await createClient();
   const { count: photoCount } = await supabase
     .from("site_photos")
@@ -34,6 +38,16 @@ export default async function SiteDetailPage({
 
   const siteSchedules = await getSchedulesForProject(id);
   const progressPercent = getSiteProgressPercent(site);
+
+  let checklistSummary = null;
+  try {
+    const items = await getProgressItems(id);
+    if (items.length > 0) {
+      checklistSummary = await getProgressSummary(id);
+    }
+  } catch {
+    checklistSummary = null;
+  }
 
   return (
     <>
@@ -49,6 +63,46 @@ export default async function SiteDetailPage({
         percent={progressPercent}
         reportCount={reportCount ?? 0}
       />
+
+      <Card className="mb-8 !p-5">
+        <h2 className="mb-4 text-lg font-bold text-gray-800">工事進行状況</h2>
+        {checklistSummary ? (
+          <>
+            <div className="mb-4 text-center">
+              <p className="text-4xl font-bold text-navy-950">
+                {checklistSummary.percent}%
+              </p>
+              <p className="mt-1 text-base text-gray-600">
+                未完了 {checklistSummary.pending}件 / 全
+                {checklistSummary.total}件
+              </p>
+              <div className="mt-3 h-4 overflow-hidden rounded-full bg-gray-100">
+                <div
+                  className="h-full rounded-full bg-navy-900"
+                  style={{ width: `${checklistSummary.percent}%` }}
+                />
+              </div>
+            </div>
+            <Link href={`/sites/${id}/progress`}>
+              <Button fullWidth size="md">
+                チェックリストを開く
+              </Button>
+            </Link>
+          </>
+        ) : (
+          <>
+            <p className="mb-4 text-base text-gray-600">
+              紙の工事進行表をスマホでチェックできます。
+            </p>
+            {profile ? (
+              <SeedProgressButton
+                projectId={id}
+                companyId={profile.company_id}
+              />
+            ) : null}
+          </>
+        )}
+      </Card>
 
       <Card className="mb-8">
         <div className="mb-4">

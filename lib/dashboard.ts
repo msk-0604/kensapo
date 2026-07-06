@@ -2,13 +2,22 @@ import { createClient } from "@/lib/supabase/server";
 import { getProjects } from "@/lib/projects";
 import { todayISO } from "@/lib/utils";
 import type { DailyReport, SitePhoto } from "@/types/database";
+import type { ScheduleWithDetails } from "@/lib/schedules";
+import { getSchedulesForDate, getInProgressSchedulesForToday } from "@/lib/schedules";
+import { getAllProjectsProgressSummaries } from "@/lib/progress-checklist";
 
 export type DashboardStats = {
   todaySiteCount: number;
   todayWorkerCount: number;
   missingReportCount: number;
+  pendingChecklistCount: number;
   latestPhotos: (SitePhoto & { project_name: string })[];
   latestReports: (DailyReport & { project_name: string })[];
+  todaySchedules: ScheduleWithDetails[];
+  inProgressSchedules: ScheduleWithDetails[];
+  siteProgressSummaries: Awaited<
+    ReturnType<typeof getAllProjectsProgressSummaries>
+  >;
 };
 
 export async function getDashboardStats(): Promise<DashboardStats> {
@@ -64,11 +73,34 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     };
   });
 
+  let todaySchedules: ScheduleWithDetails[] = [];
+  let inProgressSchedules: ScheduleWithDetails[] = [];
+  let siteProgressSummaries: Awaited<
+    ReturnType<typeof getAllProjectsProgressSummaries>
+  > = [];
+  let pendingChecklistCount = 0;
+
+  try {
+    todaySchedules = await getSchedulesForDate(today);
+    inProgressSchedules = await getInProgressSchedulesForToday();
+    siteProgressSummaries = await getAllProjectsProgressSummaries();
+    pendingChecklistCount = siteProgressSummaries.reduce(
+      (sum, s) => sum + s.pending,
+      0
+    );
+  } catch {
+    // マイグレーション未適用時
+  }
+
   return {
     todaySiteCount: activeToday.length,
     todayWorkerCount: scheduleCount ?? 0,
     missingReportCount,
+    pendingChecklistCount,
     latestPhotos,
     latestReports,
+    todaySchedules,
+    inProgressSchedules,
+    siteProgressSummaries,
   };
 }
