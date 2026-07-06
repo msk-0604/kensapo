@@ -31,6 +31,7 @@ export function PhotoUpload({
   const [photos, setPhotos] = useState<PhotoWithUrl[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [title, setTitle] = useState("");
   const [comment, setComment] = useState("");
   const [takenAt, setTakenAt] = useState(todayISO());
   const [error, setError] = useState("");
@@ -90,11 +91,15 @@ export function PhotoUpload({
       return;
     }
 
+    const safeTitle = title.trim().slice(0, 200);
     const safeComment = comment.trim().slice(0, LIMITS.photoComment);
 
     setUploading(true);
     setError("");
     const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     const path = buildStoragePath(companyId, projectId, validated.ext);
 
     try {
@@ -111,12 +116,15 @@ export function PhotoUpload({
         project_id: projectId,
         storage_path: path,
         image_url: path,
+        title: safeTitle || null,
         comment: safeComment || null,
         taken_at: takenAt,
+        uploaded_by: user?.id ?? null,
       });
 
       if (insertError) throw insertError;
 
+      setTitle("");
       setComment("");
       await loadPhotos();
     } catch (err) {
@@ -154,6 +162,13 @@ export function PhotoUpload({
           撮影日とメモを入力してから、下のボタンで写真を選ぶか撮影してください。
         </p>
         <section className="space-y-5">
+          <Input
+            label="写真のタイトル（任意）"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="例：外壁タイル貼り完了"
+            maxLength={200}
+          />
           <Input
             label="撮影した日"
             type="date"
@@ -226,9 +241,14 @@ export function PhotoUpload({
                   />
                 </section>
                 <section className="p-5">
-                  <p className="text-base font-bold text-gray-600">
-                    撮影日：{photo.taken_at}
+                <p className="text-base font-bold text-gray-600">
+                  撮影日：{photo.taken_at}
+                </p>
+                {photo.title ? (
+                  <p className="mt-2 text-lg font-bold text-navy-950">
+                    {photo.title}
                   </p>
+                ) : null}
                   {photo.comment ? (
                     <p className="mt-2 text-lg leading-relaxed text-gray-800">
                       {photo.comment}

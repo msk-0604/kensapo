@@ -36,12 +36,17 @@ export function DailyReportForm({
     setError("");
 
     const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     const { data, error: insertError } = await supabase
       .from("daily_reports")
       .insert({
         project_id: projectId,
         ...form,
         workers_count: Number(form.workers_count),
+        created_by: user?.id ?? null,
+        status: "submitted",
       })
       .select()
       .single();
@@ -53,7 +58,7 @@ export function DailyReportForm({
     }
 
     router.push(
-      `/projects/${projectId}/reports/${data.id}/generate?name=${encodeURIComponent(projectName)}`
+      `/sites/${projectId}/reports/${data.id}/generate?name=${encodeURIComponent(projectName)}`
     );
   }
 

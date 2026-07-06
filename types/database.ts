@@ -1,4 +1,6 @@
 export type ProjectStatus = "not_started" | "in_progress" | "completed";
+export type WorkerStatus = "active" | "inactive";
+export type ReportStatus = "draft" | "submitted";
 
 export interface Company {
   id: string;
@@ -14,6 +16,7 @@ export interface Profile {
   created_at: string;
 }
 
+/** DB: projects（UI上は「現場 / sites」） */
 export interface Project {
   id: string;
   company_id: string;
@@ -27,13 +30,37 @@ export interface Project {
   created_at: string;
 }
 
+export type Site = Project;
+
+export interface Worker {
+  id: string;
+  company_id: string;
+  name: string;
+  phone: string | null;
+  trade: string | null;
+  status: WorkerStatus;
+  created_at: string;
+}
+
+export interface Schedule {
+  id: string;
+  company_id: string;
+  project_id: string;
+  worker_id: string;
+  schedule_date: string;
+  work_content: string | null;
+  created_at: string;
+}
+
 export interface SitePhoto {
   id: string;
   project_id: string;
   image_url: string;
   storage_path: string | null;
+  title: string | null;
   comment: string | null;
   taken_at: string | null;
+  uploaded_by: string | null;
   created_at: string;
 }
 
@@ -53,6 +80,8 @@ export interface DailyReport {
   issues: string | null;
   next_plan: string | null;
   ai_report: string | null;
+  created_by: string | null;
+  status: ReportStatus;
   created_at: string;
 }
 

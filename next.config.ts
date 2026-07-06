@@ -11,6 +11,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: "/projects", destination: "/sites", permanent: true },
+      { source: "/projects/:path*", destination: "/sites/:path*", permanent: true },
+      { source: "/register", destination: "/login", permanent: false },
+    ];
+  },
   // Vercel / CI の Environment Variables をビルド時にも確実に参照する
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",

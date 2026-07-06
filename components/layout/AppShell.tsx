@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/dashboard", label: "ホーム" },
-  { href: "/projects", label: "現場一覧" },
+  { href: "/sites", label: "現場" },
+  { href: "/schedule", label: "予定" },
   { href: "/settings", label: "設定" },
 ];
 
@@ -51,12 +52,10 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-lg flex-1 px-5 py-8">
-        {children}
-      </main>
+      <main className="mx-auto w-full max-w-lg flex-1 px-5 py-8">{children}</main>
 
       <nav className="sticky bottom-0 border-t-2 border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]">
-        <div className="mx-auto flex max-w-lg items-stretch gap-1 px-3 py-3">
+        <div className="mx-auto flex max-w-lg flex-wrap items-stretch gap-1 px-2 py-2">
           {navItems.map(({ href, label }) => {
             const active =
               pathname === href || pathname.startsWith(`${href}/`);
@@ -65,7 +64,7 @@ export function AppShell({
                 key={href}
                 href={href}
                 className={cn(
-                  "flex flex-1 items-center justify-center rounded-xl px-2 py-3 text-center text-base font-bold leading-tight transition-colors",
+                  "flex min-w-[4.5rem] flex-1 items-center justify-center rounded-xl px-1 py-3 text-center text-sm font-bold leading-tight sm:text-base",
                   active
                     ? "bg-navy-900 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -78,7 +77,7 @@ export function AppShell({
           <button
             type="button"
             onClick={handleLogout}
-            className="flex flex-1 items-center justify-center rounded-xl bg-gray-100 px-2 py-3 text-center text-base font-bold leading-tight text-gray-700 hover:bg-gray-200"
+            className="flex min-w-[4.5rem] flex-1 items-center justify-center rounded-xl bg-gray-100 px-1 py-3 text-center text-sm font-bold leading-tight text-gray-700 hover:bg-gray-200 sm:text-base"
           >
             ログアウト
           </button>

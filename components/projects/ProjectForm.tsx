@@ -68,7 +68,7 @@ export function ProjectForm({ project, companyId }: Props) {
           .update(payload)
           .eq("id", project.id);
         if (updateError) throw updateError;
-        router.push(`/projects/${project.id}`);
+        router.push(`/sites/${project.id}`);
       } else {
         const { data, error: insertError } = await supabase
           .from("projects")
@@ -76,7 +76,7 @@ export function ProjectForm({ project, companyId }: Props) {
           .select()
           .single();
         if (insertError) throw insertError;
-        router.push(`/projects/${data.id}`);
+        router.push(`/sites/${data.id}`);
       }
       router.refresh();
     } catch (err) {

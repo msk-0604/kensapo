@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
+import { Textarea } from "@/components/ui/Input";
 import { LoadingScreen } from "@/components/ui/Loading";
 import { HintBox } from "@/components/ui/HintBox";
 
@@ -19,7 +20,10 @@ export function GenerateReport({
   const [formatted, setFormatted] = useState("");
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     async function run() {
@@ -80,6 +84,25 @@ export function GenerateReport({
     run();
   }, [projectId, reportId]);
 
+  async function handleSave() {
+    setSaving(true);
+    setError("");
+    const supabase = createClient();
+    const { error: updateError } = await supabase
+      .from("daily_reports")
+      .update({ ai_report: formatted })
+      .eq("id", reportId)
+      .eq("project_id", projectId);
+
+    setSaving(false);
+    if (updateError) {
+      setError(updateError.message);
+      return;
+    }
+    setEditing(false);
+    setSaved(true);
+  }
+
   if (loading || generating) {
     return (
       <LoadingScreen
@@ -92,7 +115,7 @@ export function GenerateReport({
     );
   }
 
-  if (error) {
+  if (error && !formatted) {
     return (
       <section className="space-y-4">
         <p className="rounded-2xl border-2 border-red-200 bg-red-50 px-5 py-4 text-lg text-red-700">
@@ -101,7 +124,7 @@ export function GenerateReport({
         <Button
           variant="secondary"
           fullWidth
-          onClick={() => router.push(`/projects/${projectId}`)}
+          onClick={() => router.push(`/sites/${projectId}`)}
         >
           現場の画面に戻る
         </Button>
@@ -114,27 +137,70 @@ export function GenerateReport({
       <HintBox>
         <p className="font-bold">報告書ができました</p>
         <p className="mt-1">
-          内容を確認して、印刷ボタンからお客様に渡せる形で保存できます。
+          内容を確認・編集してから、保存や印刷ができます。
         </p>
       </HintBox>
+
+      {saved ? (
+        <p className="rounded-2xl border-2 border-emerald-200 bg-emerald-50 px-5 py-4 text-lg text-emerald-800">
+          報告書を保存しました。
+        </p>
+      ) : null}
 
       <section className="rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-bold text-navy-950">
           お客様向け報告書
         </h2>
-        <pre className="whitespace-pre-wrap font-sans text-lg leading-loose text-gray-800">
-          {formatted}
-        </pre>
+        {editing ? (
+          <Textarea
+            label="報告書の内容"
+            value={formatted}
+            onChange={(e) => setFormatted(e.target.value)}
+            rows={16}
+          />
+        ) : (
+          <pre className="whitespace-pre-wrap font-sans text-lg leading-loose text-gray-800">
+            {formatted}
+          </pre>
+        )}
       </section>
 
+      {error ? (
+        <p className="rounded-2xl border-2 border-red-200 bg-red-50 px-5 py-4 text-base text-red-700">
+          {error}
+        </p>
+      ) : null}
+
       <section className="space-y-4">
-        <Link href={`/projects/${projectId}/reports/${reportId}/pdf`}>
-          <Button fullWidth>報告書を印刷する</Button>
-        </Link>
+        {editing ? (
+          <>
+            <Button fullWidth loading={saving} onClick={handleSave}>
+              {saving ? "保存しています" : "編集内容を保存する"}
+            </Button>
+            <Button
+              variant="secondary"
+              fullWidth
+              onClick={() => setEditing(false)}
+            >
+              編集をやめる
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button fullWidth onClick={() => setEditing(true)}>
+              報告書を編集する
+            </Button>
+            <Link href={`/sites/${projectId}/reports/${reportId}/pdf`}>
+              <Button variant="secondary" fullWidth>
+                報告書を印刷する
+              </Button>
+            </Link>
+          </>
+        )}
         <Button
           variant="secondary"
           fullWidth
-          onClick={() => router.push(`/projects/${projectId}`)}
+          onClick={() => router.push(`/sites/${projectId}`)}
         >
           現場の画面に戻る
         </Button>
