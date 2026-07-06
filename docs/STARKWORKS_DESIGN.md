@@ -76,3 +76,10 @@ supabase/migrations/
 ## セットアップ
 
 Supabase SQL Editor で **003_starkworks_features.sql** を実行してください。
+
+### 顔認証・指紋ログイン（Passkey）
+
+1. Supabase Dashboard → **Authentication → Passkeys** を有効化
+2. Relying Party ID に本番ドメイン（例：`kensapo.vercel.app`）を設定
+3. ユーザーは初回メールログイン後、**設定**から「この端末で顔認証を登録」
+4. 次回からログイン画面の「顔認証・指紋でログイン」が使える（iPhone Face ID / Android 指紋）

@@ -5,7 +5,10 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { StatusBadge } from "@/components/ui/Badge";
+import { SiteProgressBar } from "@/components/sites/SiteProgressBar";
 import { getSite } from "@/lib/sites";
+import { getSchedulesForProject } from "@/lib/schedules";
+import { getSiteProgressPercent } from "@/lib/progress";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/utils";
 
@@ -29,6 +32,9 @@ export default async function SiteDetailPage({
     .select("*", { count: "exact", head: true })
     .eq("project_id", id);
 
+  const siteSchedules = await getSchedulesForProject(id);
+  const progressPercent = getSiteProgressPercent(site);
+
   return (
     <>
       <PageHeader
@@ -36,6 +42,12 @@ export default async function SiteDetailPage({
         description="この現場の写真や日報を管理します"
         backHref="/sites"
         backLabel="現場一覧に戻る"
+      />
+
+      <SiteProgressBar
+        site={site}
+        percent={progressPercent}
+        reportCount={reportCount ?? 0}
       />
 
       <Card className="mb-8">
@@ -78,6 +90,52 @@ export default async function SiteDetailPage({
           </Link>
         </div>
       </Card>
+
+      {siteSchedules.length > 0 ? (
+        <Card className="mb-8 !p-5">
+          <h2 className="mb-4 text-lg font-bold text-gray-800">
+            この現場の予定
+          </h2>
+          <ul className="space-y-3">
+            {siteSchedules.map((s) => (
+              <li
+                key={s.id}
+                className="rounded-xl border-2 border-gray-100 bg-gray-50 px-4 py-3"
+              >
+                <p className="text-base font-bold text-navy-950">
+                  {formatDate(s.schedule_date)} — {s.worker_name}
+                </p>
+                {s.work_content ? (
+                  <p className="mt-1 text-base text-gray-600">
+                    {s.work_content}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4">
+            <Link href="/schedule">
+              <Button variant="secondary" fullWidth size="md">
+                予定を追加・変更する
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      ) : (
+        <Card className="mb-8 !p-5">
+          <h2 className="mb-2 text-lg font-bold text-gray-800">
+            この現場の予定
+          </h2>
+          <p className="mb-4 text-base text-gray-600">
+            まだ予定が登録されていません。
+          </p>
+          <Link href="/schedule">
+            <Button fullWidth size="md">
+              作業員の予定を登録する
+            </Button>
+          </Link>
+        </Card>
+      )}
 
       <section className="space-y-4">
         <h2 className="text-lg font-bold text-gray-800">この現場でできること</h2>

@@ -7,25 +7,38 @@ import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { todayISO } from "@/lib/utils";
 import type { Project, Worker } from "@/types/database";
+import type { ScheduleWithDetails } from "@/lib/schedules";
 
 export function ScheduleForm({
   companyId,
   workers,
   projects,
+  schedule,
+  defaultDate,
+  onCancel,
 }: {
   companyId: string;
   workers: Worker[];
   projects: Project[];
+  schedule?: ScheduleWithDetails;
+  defaultDate?: string;
+  onCancel?: () => void;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
-    schedule_date: todayISO(),
-    project_id: projects[0]?.id ?? "",
-    worker_id: workers[0]?.id ?? "",
-    work_content: "",
+    schedule_date: schedule?.schedule_date ?? defaultDate ?? todayISO(),
+    project_id: schedule?.project_id ?? projects[0]?.id ?? "",
+    worker_id: schedule?.worker_id ?? workers[0]?.id ?? "",
+    work_content: schedule?.work_content ?? "",
   });
+
+  useEffect(() => {
+    if (defaultDate && !schedule) {
+      setForm((f) => ({ ...f, schedule_date: defaultDate }));
+    }
+  }, [defaultDate, schedule]);
 
   useEffect(() => {
     if (projects.length && !form.project_id) {
@@ -42,20 +55,33 @@ export function ScheduleForm({
     setError("");
     const supabase = createClient();
 
-    const { error: insertError } = await supabase.from("schedules").insert({
-      company_id: companyId,
+    const payload = {
       project_id: form.project_id,
       worker_id: form.worker_id,
       schedule_date: form.schedule_date,
       work_content: form.work_content.trim() || null,
-    });
+    };
+
+    const { error: saveError } = schedule
+      ? await supabase
+          .from("schedules")
+          .update(payload)
+          .eq("id", schedule.id)
+      : await supabase.from("schedules").insert({
+          ...payload,
+          company_id: companyId,
+        });
 
     setLoading(false);
-    if (insertError) {
-      setError(insertError.message);
+    if (saveError) {
+      setError(saveError.message);
       return;
     }
-    router.push("/schedule");
+
+    if (onCancel) {
+      onCancel();
+    }
+    router.push(`/schedule?date=${form.schedule_date}`);
     router.refresh();
   }
 
@@ -110,9 +136,20 @@ export function ScheduleForm({
           {error}
         </p>
       ) : null}
-      <Button type="submit" fullWidth loading={loading}>
-        {loading ? "登録しています" : "この予定を登録する"}
-      </Button>
+      <div className={onCancel ? "grid grid-cols-2 gap-3" : ""}>
+        {onCancel ? (
+          <Button type="button" variant="secondary" fullWidth onClick={onCancel}>
+            やめる
+          </Button>
+        ) : null}
+        <Button type="submit" fullWidth loading={loading} className={onCancel ? "" : ""}>
+          {loading
+            ? "保存しています"
+            : schedule
+              ? "変更を保存する"
+              : "この予定を登録する"}
+        </Button>
+      </div>
     </form>
   );
 }

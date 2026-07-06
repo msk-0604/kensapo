@@ -3,5 +3,9 @@ import { requireSupabasePublicEnv } from "@/lib/supabase/env";
 
 export function createClient() {
   const env = requireSupabasePublicEnv();
-  return createBrowserClient(env.url, env.anonKey);
+  return createBrowserClient(env.url, env.anonKey, {
+    auth: {
+      experimental: { passkey: true },
+    },
+  });
 }

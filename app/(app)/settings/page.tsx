@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { ActionLink } from "@/components/ui/ActionLink";
+import { PasskeySettings } from "@/components/auth/PasskeySettings";
 import { getProfile, getSessionUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -39,6 +40,8 @@ export default async function SettingsPage() {
       </section>
 
       <section className="space-y-4">
+        <PasskeySettings />
+
         <Card>
           <h2 className="mb-3 text-base font-bold text-gray-600">
             会社情報

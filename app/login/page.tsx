@@ -11,6 +11,7 @@ import {
   isValidEmail,
   LIMITS,
 } from "@/lib/security/validation";
+import { PasskeyLoginButton } from "@/components/auth/PasskeyLoginButton";
 
 type Mode = "login" | "signup";
 
@@ -168,6 +169,8 @@ export default function LoginPage() {
           <Button type="submit" fullWidth loading={loading}>
             {mode === "login" ? "\u30ed\u30b0\u30a4\u30f3" : "\u30a2\u30ab\u30a6\u30f3\u30c8\u4f5c\u6210"}
           </Button>
+
+          {mode === "login" ? <PasskeyLoginButton /> : null}
         </form>
       </div>
     </div>

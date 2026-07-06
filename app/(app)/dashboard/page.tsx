@@ -4,17 +4,25 @@ import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ProgressCharts } from "@/components/dashboard/ProgressCharts";
 import { getSites } from "@/lib/sites";
 import { getDashboardStats } from "@/lib/dashboard";
+import { getProgressChartData } from "@/lib/progress";
 import { formatDate } from "@/lib/utils";
 
 export default async function DashboardPage() {
   const sites = await getSites();
   let stats = null;
+  let progressData = null;
   try {
     stats = await getDashboardStats();
   } catch {
     stats = null;
+  }
+  try {
+    progressData = await getProgressChartData();
+  } catch {
+    progressData = null;
   }
 
   return (
@@ -67,6 +75,8 @@ export default async function DashboardPage() {
               </Card>
             </section>
           ) : null}
+
+          {progressData ? <ProgressCharts data={progressData} /> : null}
 
           <section className="mb-8 space-y-4">
             <ActionLink href="/sites" description="登録した現場の一覧を見る">
