@@ -27,15 +27,20 @@ cp .env.example .env.local
 
 ### 3. Supabase
 
-1. [Supabase](https://supabase.com) でプロジェクト作成
-2. SQL Editor で `supabase/migrations/001_initial_schema.sql` を実行
-3. `supabase/migrations/002_security_hardening.sql` を実行
-4. **`supabase/migrations/003_starkworks_features.sql` を実行**（作業員・予定・日報ステータス）
-5. **`supabase/migrations/004_progress_and_schedule.sql` を実行**（工事進行チェック・行動予定拡張）
-6. `supabase/storage.sql` を実行（**非公開バケット** `site-photos`）
-7. Authentication → Providers → Email を有効化
-8. 開発時は Email confirmations を OFF 推奨（即ログイン可能）
-9. Auth → Settings でパスワード最小長 8 文字を推奨
+**新規・未設定の場合（推奨）：** SQL Editor で次の **1ファイルだけ** 実行
+
+```
+supabase/RUN_THIS_IN_SUPABASE.sql
+```
+
+またはアプリの **/setup** ページから SQL をコピーして実行。
+
+**ゼロから全部入れる場合**は順に実行：
+
+1. `supabase/migrations/001_initial_schema.sql`
+2. `supabase/migrations/002_security_hardening.sql`
+3. `supabase/RUN_THIS_IN_SUPABASE.sql`（003+004 まとめ）
+4. `supabase/storage.sql`（写真アップロード用）
 
 ### 4. 起動
 

@@ -1,0 +1,1 @@
+-- use supabase/setup.sql instead

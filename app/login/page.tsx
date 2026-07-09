@@ -15,6 +15,19 @@ import { PasskeyLoginButton } from "@/components/auth/PasskeyLoginButton";
 
 type Mode = "login" | "signup";
 
+function withTimeout<T>(
+  promise: PromiseLike<T>,
+  ms: number,
+  message: string
+): Promise<T> {
+  return Promise.race([
+    Promise.resolve(promise),
+    new Promise<T>((_, reject) => {
+      setTimeout(() => reject(new Error(message)), ms);
+    }),
+  ]);
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("login");
@@ -41,10 +54,14 @@ export default function LoginPage() {
       }
 
       if (mode === "login") {
-        const { error: authError } = await supabase.auth.signInWithPassword({
-          email: normalizedEmail,
-          password,
-        });
+        const { error: authError } = await withTimeout(
+          supabase.auth.signInWithPassword({
+            email: normalizedEmail,
+            password,
+          }),
+          20000,
+          "ログインがタイムアウトしました。通信環境を確認してください。"
+        );
         if (authError) throw authError;
         router.push("/dashboard");
         router.refresh();
@@ -54,24 +71,53 @@ export default function LoginPage() {
       const trimmedCompany = companyName.trim().slice(0, LIMITS.companyName);
       const trimmedName = name.trim().slice(0, LIMITS.userName);
       if (!trimmedCompany || !trimmedName) {
-        throw new Error("\u4f1a\u793e\u540d\u3068\u304a\u540d\u524d\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044");
+        throw new Error("会社名とお名前を入力してください");
       }
 
-      const { data: signUpData, error: signUpError } =
-        await supabase.auth.signUp({ email: normalizedEmail, password });
+      const { data: signUpData, error: signUpError } = await withTimeout(
+        supabase.auth.signUp({
+          email: normalizedEmail,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        }),
+        20000,
+        "登録がタイムアウトしました。Supabaseの設定を確認してください。"
+      );
       if (signUpError) throw signUpError;
-      if (!signUpData.user) throw new Error("\u767b\u9332\u306b\u5931\u6557\u3057\u307e\u3057\u305f");
+      if (!signUpData.user) throw new Error("登録に失敗しました");
 
-      const { error: rpcError } = await supabase.rpc("register_company", {
-        company_name: trimmedCompany,
-        user_name: trimmedName,
-      });
-      if (rpcError) throw rpcError;
+      if (!signUpData.session) {
+        throw new Error(
+          "確認メールを送信しました。メールのリンクを開いてから、ログインしてください。※すぐ使う場合は Supabase でメール確認を OFF にしてください。"
+        );
+      }
+
+      const rpcResult = await withTimeout(
+        supabase.rpc("register_company", {
+          company_name: trimmedCompany,
+          user_name: trimmedName,
+        }),
+        15000,
+        "会社情報の登録がタイムアウトしました。"
+      );
+      const rpcError = rpcResult.error;
+      if (rpcError) {
+        if (rpcError.message.includes("already exists")) {
+          throw new Error(
+            "このアカウントはすでに登録済みです。ログインタブからログインしてください。"
+          );
+        }
+        throw rpcError;
+      }
 
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "\u30a8\u30e9\u30fc\u304c\u767a\u751f\u3057\u307e\u3057\u305f");
+      const message =
+        err instanceof Error ? err.message : "エラーが発生しました";
+      setError(message);
     } finally {
       setLoading(false);
     }

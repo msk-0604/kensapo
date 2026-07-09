@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ScanFace, Trash2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { createPasskeyClient } from "@/lib/supabase/client";
 import { getPasskeyErrorMessage, isPasskeySupported } from "@/lib/auth/passkey";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -23,7 +23,7 @@ export function PasskeySettings() {
 
   async function loadPasskeys() {
     setListLoading(true);
-    const supabase = createClient();
+    const supabase = createPasskeyClient();
     try {
       const { data, error: listError } = await supabase.auth.passkey.list();
       if (listError) throw listError;
@@ -43,7 +43,7 @@ export function PasskeySettings() {
     setError("");
     setSuccess("");
     setLoading(true);
-    const supabase = createClient();
+    const supabase = createPasskeyClient();
 
     try {
       const { error: registerError } = await supabase.auth.registerPasskey();
@@ -62,7 +62,7 @@ export function PasskeySettings() {
 
     setError("");
     setSuccess("");
-    const supabase = createClient();
+    const supabase = createPasskeyClient();
     const { error: deleteError } = await supabase.auth.passkey.delete({
       passkeyId: id,
     });
