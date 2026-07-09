@@ -42,9 +42,9 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const supabase = createClient();
 
     try {
+      const supabase = createClient();
       const normalizedEmail = email.trim().toLowerCase();
       if (!isValidEmail(normalizedEmail)) {
         throw new Error("\u6709\u52b9\u306a\u30e1\u30fc\u30eb\u30a2\u30c9\u30ec\u30b9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044");
