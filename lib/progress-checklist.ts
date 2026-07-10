@@ -44,35 +44,37 @@ export async function getAllProjectsProgressSummaries(): Promise<
   (ProgressSummary & { project_id: string; project_name: string })[]
 > {
   const supabase = await createClient();
-  const { data: projects, error: projError } = await supabase
-    .from("projects")
-    .select("id, name")
-    .neq("status", "completed")
-    .order("name");
+  const { data: rows, error } = await supabase
+    .from("project_progress_items")
+    .select("checked, project_id, projects!inner(id, name, status)")
+    .neq("projects.status", "completed");
 
-  if (projError) throw projError;
+  if (error) throw error;
 
-  const results: (ProgressSummary & {
-    project_id: string;
-    project_name: string;
-  })[] = [];
+  const grouped = new Map<
+    string,
+    { project_name: string; checked: boolean[] }
+  >();
 
-  for (const p of projects ?? []) {
-    const { data: items } = await supabase
-      .from("project_progress_items")
-      .select("checked")
-      .eq("project_id", p.id);
-
-    if (!items || items.length === 0) continue;
-
-    results.push({
-      project_id: p.id,
-      project_name: p.name,
-      ...calcProgressSummary(items),
-    });
+  for (const row of rows ?? []) {
+    const projectRaw = row.projects as
+      | { id: string; name: string }
+      | { id: string; name: string }[];
+    const project = Array.isArray(projectRaw) ? projectRaw[0] : projectRaw;
+    if (!project) continue;
+    const existing = grouped.get(row.project_id) ?? {
+      project_name: project.name,
+      checked: [],
+    };
+    existing.checked.push(row.checked);
+    grouped.set(row.project_id, existing);
   }
 
-  return results;
+  return Array.from(grouped.entries()).map(([project_id, value]) => ({
+    project_id,
+    project_name: value.project_name,
+    ...calcProgressSummary(value.checked.map((checked) => ({ checked }))),
+  }));
 }
 
 export async function getTodayCompletedProgressItems(

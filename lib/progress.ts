@@ -87,22 +87,31 @@ export async function getProgressChartData(): Promise<ProgressChartData> {
 
   const weeklyReports: WeeklyReportItem[] = [];
   const today = todayISO();
-  for (let i = 3; i >= 0; i--) {
+  const weekQueries = Array.from({ length: 4 }, (_, index) => {
+    const i = 3 - index;
     const weekEnd = addDaysISO(today, -i * 7);
     const weekStart = addDaysISO(weekEnd, -6);
-    const { count } = await supabase
+    return supabase
       .from("daily_reports")
       .select("*", { count: "exact", head: true })
       .gte("report_date", weekStart)
-      .lte("report_date", weekEnd);
+      .lte("report_date", weekEnd)
+      .then(({ count }) => ({
+        weekStart,
+        i,
+        count: count ?? 0,
+      }));
+  });
 
+  const weekResults = await Promise.all(weekQueries);
+  for (const { weekStart, i, count } of weekResults) {
     const startLabel = new Date(`${weekStart}T12:00:00`).toLocaleDateString(
       "ja-JP",
       { month: "numeric", day: "numeric" }
     );
     weeklyReports.push({
       label: i === 0 ? "今週" : startLabel,
-      count: count ?? 0,
+      count,
     });
   }
 

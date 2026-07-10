@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Calendar, Home, MapPin, Settings } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -14,15 +16,47 @@ const navItems = [
 
 export function AppShell({
   children,
-  userName,
-  companyName,
+  userId,
+  userName: initialUserName,
+  companyName: initialCompanyName,
 }: {
   children: React.ReactNode;
+  userId: string;
   userName?: string;
   companyName?: string;
 }) {
   const pathname = usePathname();
+  const [userName, setUserName] = useState(initialUserName ?? "");
+  const [companyName, setCompanyName] = useState(initialCompanyName ?? "");
   const isPrintView = pathname.includes("/pdf");
+
+  useEffect(() => {
+    if (initialUserName) return;
+
+    let cancelled = false;
+    const supabase = createClient();
+    supabase
+      .from("profiles")
+      .select("name, companies(name)")
+      .eq("id", userId)
+      .single()
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        const row = data as {
+          name: string;
+          companies: { name: string } | { name: string }[] | null;
+        };
+        const company = Array.isArray(row.companies)
+          ? row.companies[0]
+          : row.companies;
+        setUserName(row.name);
+        setCompanyName(company?.name ?? "");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, initialUserName]);
 
   if (isPrintView) {
     return (
@@ -38,7 +72,9 @@ export function AppShell({
             KenSapo
           </Link>
           <div className="text-right text-base leading-snug text-gray-700">
-            <p className="text-lg font-bold text-gray-900">{userName}</p>
+            <p className="text-lg font-bold text-gray-900">
+              {userName || "\u00A0"}
+            </p>
             {companyName ? (
               <p className="text-base text-gray-600">{companyName}</p>
             ) : null}

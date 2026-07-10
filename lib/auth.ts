@@ -1,26 +1,37 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/types/database";
 
-export async function getSessionUser() {
+export const getCachedSession = cache(async () => {
   const supabase = await createClient();
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session;
+});
+
+export const getCachedProfileWithCompany = cache(async () => {
+  const session = await getCachedSession();
+  if (!session?.user) return null;
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("*, companies(name)")
+    .eq("id", session.user.id)
+    .single();
+
+  return data as
+    | (Profile & { companies: { name: string } | null })
+    | null;
+});
+
+export async function getSessionUser() {
+  const session = await getCachedSession();
+  return session?.user ?? null;
 }
 
 export async function getProfile(): Promise<Profile | null> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  return data;
+  const profile = await getCachedProfileWithCompany();
+  return profile;
 }
