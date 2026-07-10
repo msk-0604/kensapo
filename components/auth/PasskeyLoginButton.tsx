@@ -3,11 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ScanFace } from "lucide-react";
-import { createPasskeyClient } from "@/lib/supabase/client";
+import { createPasskeyClientWithConfig } from "@/lib/supabase/client";
 import { getPasskeyErrorMessage, isPasskeySupported } from "@/lib/auth/passkey";
 import { Button } from "@/components/ui/Button";
 
-export function PasskeyLoginButton() {
+type PasskeyLoginButtonProps = {
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+};
+
+export function PasskeyLoginButton({
+  supabaseUrl,
+  supabaseAnonKey,
+}: PasskeyLoginButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -16,7 +24,10 @@ export function PasskeyLoginButton() {
   async function handlePasskeyLogin() {
     setError("");
     setLoading(true);
-    const supabase = createPasskeyClient();
+    const supabase = createPasskeyClientWithConfig(
+      supabaseUrl,
+      supabaseAnonKey
+    );
 
     try {
       const { error: authError } = await supabase.auth.signInWithPasskey();
