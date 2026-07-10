@@ -84,7 +84,7 @@ export default async function SettingsPage() {
 
         <Card className="!bg-navy-900/5">
           <p className="text-base text-gray-600">
-            ケンサポ — 現場の日報・写真・AI報告書を一元管理
+            KenSapo — 現場の日報・写真・報告書を一元管理
           </p>
         </Card>
       </section>

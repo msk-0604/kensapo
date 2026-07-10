@@ -43,7 +43,7 @@ export function AppShell({
       <header className="sticky top-0 z-40 border-b-2 border-gray-200 bg-white">
         <div className="mx-auto flex min-h-[4rem] max-w-lg items-center justify-between px-5">
           <Link href="/dashboard" className="text-xl font-bold text-navy-950">
-            ケンサポ
+            KenSapo
           </Link>
           <div className="text-right text-base leading-snug text-gray-600">
             <p className="font-bold text-gray-800">{userName}</p>

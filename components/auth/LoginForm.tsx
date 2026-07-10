@@ -140,7 +140,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
             <ClipboardList className="h-7 w-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-navy-950">
-            ケンサポ
+            KenSapo
           </h1>
           <p className="mt-2 text-sm text-gray-500">
             現場の日報・写真・報告書を、ここで。

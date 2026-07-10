@@ -37,7 +37,7 @@ export function PrintReport({
           {content}
         </pre>
         <footer className="mt-12 border-t-2 border-gray-100 pt-4 text-center text-base text-gray-400">
-          ケンサポ
+          KenSapo
         </footer>
       </article>
     </>
