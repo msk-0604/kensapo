@@ -64,10 +64,8 @@ export async function middleware(request: NextRequest) {
   });
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const user = session?.user ?? null;
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const isApi = pathname.startsWith("/api");
   const isAuthPage =
@@ -105,6 +103,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|icon.png|apple-icon.png|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

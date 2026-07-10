@@ -24,10 +24,26 @@ async function DashboardCharts() {
 }
 
 export async function DashboardDetails() {
-  const [sites, stats] = await Promise.all([
-    getSites(),
-    getDashboardStats().catch(() => null),
-  ]);
+  let sites: Awaited<ReturnType<typeof getSites>> = [];
+  let stats: Awaited<ReturnType<typeof getDashboardStats>> | null = null;
+
+  try {
+    [sites, stats] = await Promise.all([
+      getSites(),
+      getDashboardStats().catch(() => null),
+    ]);
+  } catch {
+    return (
+      <section className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 text-center">
+        <p className="text-lg font-bold text-amber-900">
+          データの読み込みに失敗しました
+        </p>
+        <p className="mt-2 text-base text-amber-800">
+          上のボタンから操作を続けられます。しばらくしてから再読み込みしてください。
+        </p>
+      </section>
+    );
+  }
 
   if (sites.length === 0) {
     return (

@@ -34,13 +34,14 @@ export function AppShell({
     if (initialUserName) return;
 
     let cancelled = false;
-    const supabase = createClient();
-    supabase
-      .from("profiles")
-      .select("name, companies(name)")
-      .eq("id", userId)
-      .single()
-      .then(({ data }) => {
+    void (async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from("profiles")
+          .select("name, companies(name)")
+          .eq("id", userId)
+          .single();
         if (cancelled || !data) return;
         const row = data as {
           name: string;
@@ -51,7 +52,10 @@ export function AppShell({
           : row.companies;
         setUserName(row.name);
         setCompanyName(company?.name ?? "");
-      });
+      } catch {
+        // 表示名の取得に失敗しても画面は使える
+      }
+    })();
 
     return () => {
       cancelled = true;
