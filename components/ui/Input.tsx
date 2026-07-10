@@ -24,14 +24,14 @@ export function Input({
     <section className="space-y-2">
       <label
         htmlFor={fieldId}
-        className="block text-[1.0625rem] font-bold text-gray-800"
+        className="block text-lg font-bold text-gray-800"
       >
         {label}
       </label>
       <input
         id={fieldId}
         className={cn(
-          "w-full rounded-2xl border-2 border-gray-300 bg-white px-5 py-4 text-lg text-gray-900 placeholder:text-gray-400 focus:border-navy-700 focus:outline-none focus:ring-4 focus:ring-navy-700/15",
+          "w-full rounded-2xl border-2 border-gray-300 bg-white px-5 py-5 text-xl text-gray-900 placeholder:text-gray-400 focus:border-navy-700 focus:outline-none focus:ring-4 focus:ring-navy-700/15",
           error && "border-red-500 focus:border-red-500 focus:ring-red-500/15",
           className
         )}
@@ -58,14 +58,14 @@ export function Textarea({
     <section className="space-y-2">
       <label
         htmlFor={fieldId}
-        className="block text-[1.0625rem] font-bold text-gray-800"
+        className="block text-lg font-bold text-gray-800"
       >
         {label}
       </label>
       <textarea
         id={fieldId}
         className={cn(
-          "min-h-[140px] w-full resize-y rounded-2xl border-2 border-gray-300 bg-white px-5 py-4 text-lg text-gray-900 placeholder:text-gray-400 focus:border-navy-700 focus:outline-none focus:ring-4 focus:ring-navy-700/15",
+          "min-h-[160px] w-full resize-y rounded-2xl border-2 border-gray-300 bg-white px-5 py-5 text-xl text-gray-900 placeholder:text-gray-400 focus:border-navy-700 focus:outline-none focus:ring-4 focus:ring-navy-700/15",
           error && "border-red-500",
           className
         )}
@@ -92,14 +92,14 @@ export function Select({
     <section className="space-y-2">
       <label
         htmlFor={fieldId}
-        className="block text-[1.0625rem] font-bold text-gray-800"
+        className="block text-lg font-bold text-gray-800"
       >
         {label}
       </label>
       <select
         id={fieldId}
         className={cn(
-          "w-full rounded-2xl border-2 border-gray-300 bg-white px-5 py-4 text-lg text-gray-900 focus:border-navy-700 focus:outline-none focus:ring-4 focus:ring-navy-700/15",
+          "w-full rounded-2xl border-2 border-gray-300 bg-white px-5 py-5 text-xl text-gray-900 focus:border-navy-700 focus:outline-none focus:ring-4 focus:ring-navy-700/15",
           className
         )}
         {...props}

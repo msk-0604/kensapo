@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { ActionLink } from "@/components/ui/ActionLink";
+import { LogoutButton } from "@/components/auth/LogoutButton";
 import { PasskeySettings } from "@/components/auth/PasskeySettings";
 import { getProfile, getSessionUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -28,7 +29,7 @@ export default async function SettingsPage() {
     <>
       <PageHeader
         title="設定"
-        description="アカウント情報"
+        description="アカウントの確認・変更"
         backHref="/dashboard"
       />
 
@@ -83,10 +84,12 @@ export default async function SettingsPage() {
         </Card>
 
         <Card className="!bg-navy-900/5">
-          <p className="text-base text-gray-600">
+          <p className="text-lg text-gray-600">
             KenSapo — 現場の日報・写真・報告書を一元管理
           </p>
         </Card>
+
+        <LogoutButton />
       </section>
     </>
   );

@@ -19,11 +19,11 @@
   --color-success: #059669;       /* 完了 */
   --color-warning: #d97706;       /* 作業中 */
 
-  /* 高齢者向けタイポグラフィ */
-  --text-base-size: 1.125rem;     /* 18px */
-  --text-label-size: 1.0625rem;   /* 17px */
-  --text-heading-size: 1.75rem;   /* 28px */
-  --touch-min: 3.5rem;            /* 56px */
+  /* 60代向け：文字大きめ・タップしやすい */
+  --text-base-size: 1.25rem;     /* 20px */
+  --text-label-size: 1.125rem;   /* 18px */
+  --text-heading-size: 1.875rem; /* 30px */
+  --touch-min: 4rem;            /* 64px */
 }
 
 @theme inline {

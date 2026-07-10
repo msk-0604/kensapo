@@ -11,7 +11,6 @@ import {
   isValidEmail,
   LIMITS,
 } from "@/lib/security/validation";
-import { PasskeyLoginButton } from "@/components/auth/PasskeyLoginButton";
 
 type Mode = "login" | "signup";
 
@@ -140,19 +139,19 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
           <h1 className="text-2xl font-bold tracking-tight text-navy-950">
             KenSapo
           </h1>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-lg text-gray-600">
             現場の日報・写真・報告書を、ここで。
           </p>
         </div>
 
-        <div className="mb-6 flex rounded-xl bg-white p-1 shadow-sm">
+        <div className="mb-6 flex rounded-2xl bg-white p-1.5 shadow-sm">
           <button
             type="button"
             onClick={() => setMode("login")}
-            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${
+            className={`flex min-h-[3.5rem] flex-1 items-center justify-center rounded-xl text-lg font-bold transition-colors ${
               mode === "login"
                 ? "bg-navy-900 text-white"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-600 hover:text-gray-800"
             }`}
           >
             ログイン
@@ -160,10 +159,10 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
           <button
             type="button"
             onClick={() => setMode("signup")}
-            className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-colors ${
+            className={`flex min-h-[3.5rem] flex-1 items-center justify-center rounded-xl text-lg font-bold transition-colors ${
               mode === "signup"
                 ? "bg-navy-900 text-white"
-                : "text-gray-500 hover:text-gray-700"
+                : "text-gray-600 hover:text-gray-800"
             }`}
           >
             新規登録
@@ -214,7 +213,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
           />
 
           {error ? (
-            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+            <p className="rounded-xl bg-red-50 px-4 py-3 text-lg text-red-700">
               {error}
             </p>
           ) : null}
@@ -222,13 +221,6 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
           <Button type="submit" fullWidth loading={loading}>
             {mode === "login" ? "ログイン" : "アカウント作成"}
           </Button>
-
-          {mode === "login" ? (
-            <PasskeyLoginButton
-              supabaseUrl={supabaseUrl}
-              supabaseAnonKey={supabaseAnonKey}
-            />
-          ) : null}
         </form>
       </div>
     </div>

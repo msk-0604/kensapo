@@ -38,7 +38,7 @@ export function DashboardTodaySchedules({
 
   return (
     <section className="mb-8">
-      <h2 className="mb-4 text-lg font-bold text-gray-800">今日の予定</h2>
+      <h2 className="mb-4 text-xl font-bold text-gray-800">今日の予定</h2>
       <ul className="space-y-4">
         {schedules.map((s) => {
           const title = s.title || s.project_name;
@@ -74,11 +74,11 @@ export function DashboardTodaySchedules({
                     <Button
                       type="button"
                       fullWidth
-                      size="md"
+                      size="lg"
                       disabled={s.status === "in_progress"}
                       onClick={() => quickStart(s.id)}
                     >
-                      {s.status === "in_progress" ? "作業中" : "開始する"}
+                      {s.status === "in_progress" ? "作業中です" : "作業を開始する"}
                     </Button>
                   </div>
                 ) : null}

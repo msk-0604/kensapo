@@ -27,6 +27,7 @@ export function ScheduleCard({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState<"start" | "end" | null>(null);
+  const [error, setError] = useState("");
   const isToday = schedule.schedule_date === todayISO();
   const displayTitle =
     schedule.title || schedule.project_name || "現場作業";
@@ -50,9 +51,10 @@ export function ScheduleCard({
       .eq("id", schedule.id);
     setLoading(null);
     if (error) {
-      window.alert(error.message);
+      setError(error.message);
       return;
     }
+    setError("");
     router.refresh();
   }
 
@@ -70,9 +72,10 @@ export function ScheduleCard({
       .eq("id", schedule.id);
     setLoading(null);
     if (error) {
-      window.alert(error.message);
+      setError(error.message);
       return;
     }
+    setError("");
     router.refresh();
   }
 
@@ -103,8 +106,8 @@ export function ScheduleCard({
 
       {schedule.work_content ? (
         <div className="mt-4 rounded-xl bg-gray-50 px-4 py-3">
-          <p className="text-sm font-bold text-gray-500">作業内容</p>
-          <p className="mt-1 text-lg text-navy-950">{schedule.work_content}</p>
+          <p className="text-base font-bold text-gray-600">作業内容</p>
+          <p className="mt-1 text-xl text-navy-950">{schedule.work_content}</p>
         </div>
       ) : null}
 
@@ -127,37 +130,43 @@ export function ScheduleCard({
         </p>
       ) : null}
 
-      <p className="mt-2 text-sm font-bold text-gray-500">状態：{statusLabel}</p>
+      <p className="mt-2 text-lg font-bold text-gray-700">状態：{statusLabel}</p>
+
+      {error ? (
+        <p className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-lg text-red-700">
+          {error}
+        </p>
+      ) : null}
 
       {isToday && schedule.status !== "completed" ? (
-        <div className="mt-5 grid grid-cols-2 gap-3">
+        <div className="mt-5 space-y-3">
           <Button
             type="button"
             fullWidth
-            size="md"
+            size="lg"
             loading={loading === "start"}
             disabled={schedule.status === "in_progress"}
             onClick={handleStart}
           >
-            開始する
+            作業を開始する
           </Button>
           <Button
             type="button"
             variant="secondary"
             fullWidth
-            size="md"
+            size="lg"
             loading={loading === "end"}
             disabled={!schedule.actual_start_time && schedule.status !== "in_progress"}
             onClick={handleEnd}
           >
-            終了する
+            作業を終了する
           </Button>
         </div>
       ) : null}
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="mt-4 space-y-3">
         <Button type="button" variant="secondary" size="md" fullWidth onClick={onEdit}>
-          変更
+          内容を変更する
         </Button>
         <Button
           type="button"
@@ -167,7 +176,7 @@ export function ScheduleCard({
           loading={deleting}
           onClick={onDelete}
         >
-          削除
+          この予定を削除する
         </Button>
       </div>
     </Card>

@@ -21,7 +21,7 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <PageHeader title="ホーム" description="今日やることを選んでください" />
+      <PageHeader title="ホーム" description="やりたいことを押してください" />
 
       {sites.length === 0 ? (
         <EmptyState
@@ -40,6 +40,26 @@ export default async function DashboardPage() {
         />
       ) : (
         <>
+          <section className="mb-8 space-y-4">
+            <ActionLink href="/schedule" description="今日の作業を確認・開始する">
+              今日の予定を見る
+            </ActionLink>
+            <ActionLink
+              href="/sites?intent=photo"
+              variant="secondary"
+              description="現場の写真を撮って保存する"
+            >
+              写真を撮る
+            </ActionLink>
+            <ActionLink
+              href="/sites"
+              variant="secondary"
+              description="登録した工事現場の一覧"
+            >
+              現場を見る
+            </ActionLink>
+          </section>
+
           {stats ? (
             <section className="mb-8 grid grid-cols-2 gap-4">
               <Card className="!p-5 text-center">
@@ -116,36 +136,9 @@ export default async function DashboardPage() {
 
           {progressData ? <ProgressCharts data={progressData} /> : null}
 
-          <section className="mb-8 space-y-4">
-            <ActionLink href="/sites" description="登録した現場の一覧を見る">
-              現場を見る
-            </ActionLink>
-            <ActionLink
-              href="/sites?intent=photo"
-              variant="secondary"
-              description="現場を選んで写真を撮る・追加する"
-            >
-              写真を追加
-            </ActionLink>
-            <ActionLink
-              href="/sites?intent=report"
-              variant="secondary"
-              description="現場を選んで今日の作業を記録する"
-            >
-              日報を書く
-            </ActionLink>
-            <ActionLink
-              href="/schedule"
-              variant="secondary"
-              description="今日誰がどの現場に行くか確認する"
-            >
-              作業員予定を見る
-            </ActionLink>
-          </section>
-
           {stats && stats.latestPhotos.length > 0 ? (
             <section className="mb-8">
-              <h2 className="mb-4 text-lg font-bold text-gray-800">
+              <h2 className="mb-4 text-xl font-bold text-gray-800">
                 最新の写真
               </h2>
               <ul className="space-y-3">
@@ -153,7 +146,7 @@ export default async function DashboardPage() {
                   <li key={photo.id}>
                     <Link href={`/sites/${photo.project_id}/photos`}>
                       <Card className="!p-4">
-                        <p className="font-bold text-navy-950">
+                        <p className="text-lg font-bold text-navy-950">
                           {photo.title || photo.comment || "現場の写真"}
                         </p>
                         <p className="mt-1 text-base text-gray-500">
@@ -169,7 +162,7 @@ export default async function DashboardPage() {
 
           {stats && stats.latestReports.length > 0 ? (
             <section className="mb-8">
-              <h2 className="mb-4 text-lg font-bold text-gray-800">
+              <h2 className="mb-4 text-xl font-bold text-gray-800">
                 最新の報告書
               </h2>
               <ul className="space-y-3">
@@ -179,7 +172,7 @@ export default async function DashboardPage() {
                       href={`/sites/${report.project_id}/reports/${report.id}/generate`}
                     >
                       <Card className="!p-4">
-                        <p className="font-bold text-navy-950">
+                        <p className="text-lg font-bold text-navy-950">
                           {report.project_name}
                         </p>
                         <p className="mt-1 text-base text-gray-500">

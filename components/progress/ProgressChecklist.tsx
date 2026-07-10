@@ -133,7 +133,7 @@ export function ProgressChecklist({
                       onClick={() => toggleItem(item)}
                       disabled={savingId === item.id}
                       className={cn(
-                        "flex min-h-[3.5rem] w-full items-center gap-4 rounded-2xl border-2 px-4 py-3 text-left transition-colors",
+                        "flex min-h-[4.5rem] w-full items-center gap-4 rounded-2xl border-2 px-5 py-4 text-left text-lg transition-colors",
                         item.checked
                           ? "border-green-300 bg-green-50"
                           : "border-gray-200 bg-white active:bg-gray-50"

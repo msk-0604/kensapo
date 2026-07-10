@@ -30,21 +30,21 @@ export function ScheduleWeekNav({
         <button
           type="button"
           onClick={() => goWeek(-1)}
-          className="min-h-[3rem] rounded-xl border-2 border-gray-200 px-4 text-base font-bold text-navy-900"
+          className="min-h-[3.5rem] rounded-xl border-2 border-gray-200 px-4 text-lg font-bold text-navy-900"
         >
           前の週
         </button>
         <button
           type="button"
           onClick={() => router.push(`/schedule?date=${today}`)}
-          className="min-h-[3rem] rounded-xl bg-navy-900 px-4 text-base font-bold text-white"
+          className="min-h-[3.5rem] rounded-xl bg-navy-900 px-4 text-lg font-bold text-white"
         >
           今日
         </button>
         <button
           type="button"
           onClick={() => goWeek(1)}
-          className="min-h-[3rem] rounded-xl border-2 border-gray-200 px-4 text-base font-bold text-navy-900"
+          className="min-h-[3.5rem] rounded-xl border-2 border-gray-200 px-4 text-lg font-bold text-navy-900"
         >
           次の週
         </button>
@@ -61,28 +61,28 @@ export function ScheduleWeekNav({
               key={date}
               href={`/schedule?date=${date}`}
               className={cn(
-                "flex min-h-[4.5rem] flex-col items-center justify-center rounded-xl border-2 px-1 py-2 text-center transition-colors",
+                "flex min-h-[5.5rem] flex-col items-center justify-center rounded-xl border-2 px-1 py-2 text-center transition-colors",
                 selected
                   ? "border-navy-900 bg-navy-900 text-white"
                   : "border-gray-100 bg-gray-50 text-navy-950 hover:border-navy-300",
                 isToday && !selected && "border-navy-400"
               )}
             >
-              <span className="text-xs font-bold opacity-80">
+              <span className="text-sm font-bold opacity-80">
                 {formatWeekdayShort(date)}
               </span>
-              <span className="text-lg font-bold">{formatMonthDay(date)}</span>
+              <span className="text-xl font-bold">{formatMonthDay(date)}</span>
               {count > 0 ? (
                 <span
                   className={cn(
-                    "mt-1 rounded-full px-2 text-xs font-bold",
+                    "mt-1 rounded-full px-2 text-sm font-bold",
                     selected ? "bg-white/20" : "bg-navy-900 text-white"
                   )}
                 >
                   {count}件
                 </span>
               ) : (
-                <span className="mt-1 text-xs opacity-50">—</span>
+                <span className="mt-1 text-sm opacity-50">—</span>
               )}
             </Link>
           );

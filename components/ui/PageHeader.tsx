@@ -20,14 +20,14 @@ export function PageHeader({
       {backHref ? (
         <Link
           href={backHref}
-          className="mb-5 flex min-h-[3.5rem] w-full items-center justify-center rounded-2xl border-2 border-gray-300 bg-white px-5 text-lg font-bold text-navy-900 transition-colors hover:bg-gray-50 active:bg-gray-100"
+          className="mb-5 flex min-h-[4rem] w-full items-center justify-center rounded-2xl border-2 border-gray-300 bg-white px-5 text-xl font-bold text-navy-900 transition-colors hover:bg-gray-50 active:bg-gray-100"
         >
           ← {backLabel}
         </Link>
       ) : null}
       <section className="flex flex-col gap-4">
         <section>
-          <h1 className="text-[1.75rem] font-bold leading-tight text-navy-950">
+          <h1 className="text-[1.875rem] font-bold leading-tight text-navy-950">
             {title}
           </h1>
           {description ? (

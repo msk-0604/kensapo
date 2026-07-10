@@ -27,16 +27,16 @@ export function ActionLink({
     <Link
       href={href}
       className={cn(
-        "flex min-h-[4.5rem] w-full flex-col items-center justify-center gap-1 rounded-2xl px-6 py-5 text-center transition-colors",
+        "flex min-h-[5rem] w-full flex-col items-center justify-center gap-2 rounded-2xl px-6 py-5 text-center transition-colors",
         variants[variant],
         className
       )}
     >
-      <span className="text-xl font-bold leading-snug">{children}</span>
+      <span className="text-2xl font-bold leading-snug">{children}</span>
       {description ? (
         <span
           className={cn(
-            "text-base font-normal leading-snug",
+            "text-lg font-normal leading-snug",
             variant === "primary" ? "text-white/85" : "text-gray-600"
           )}
         >
