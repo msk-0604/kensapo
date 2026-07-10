@@ -57,7 +57,7 @@ export function DailyReportForm({
       return;
     }
 
-    router.push(
+    router.replace(
       `/sites/${projectId}/reports/${data.id}/generate?name=${encodeURIComponent(projectName)}`
     );
   }

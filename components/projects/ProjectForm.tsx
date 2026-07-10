@@ -69,7 +69,7 @@ export function ProjectForm({ project, companyId }: Props) {
           .update(payload)
           .eq("id", project.id);
         if (updateError) throw updateError;
-        router.push(`/sites/${project.id}`);
+        router.replace(`/sites/${project.id}`);
       } else {
         const { data, error: insertError } = await supabase
           .from("projects")
@@ -77,14 +77,9 @@ export function ProjectForm({ project, companyId }: Props) {
           .select()
           .single();
         if (insertError) throw insertError;
-        try {
-          await seedProgressItemsClient(data.id, companyId);
-        } catch {
-          // マイグレーション未適用時はスキップ
-        }
-        router.push(`/sites/${data.id}`);
+        router.replace(`/sites/${data.id}`);
+        void seedProgressItemsClient(data.id, companyId).catch(() => {});
       }
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "\u4fdd\u5b58\u306b\u5931\u6557\u3057\u307e\u3057\u305f");
     } finally {

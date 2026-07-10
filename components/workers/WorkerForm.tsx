@@ -50,8 +50,7 @@ export function WorkerForm({
           .insert({ ...payload, company_id: companyId });
         if (insertError) throw insertError;
       }
-      router.push("/workers");
-      router.refresh();
+      router.replace("/workers");
     } catch (err) {
       setError(err instanceof Error ? err.message : "保存に失敗しました");
     } finally {

@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { DbSetupBanner } from "@/components/layout/DbSetupBanner";
-import { getProfile, getSessionUser } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
-import { checkDbHealth } from "@/lib/supabase/db-health";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -17,30 +15,27 @@ export default async function AuthenticatedLayout({
     redirect("/setup");
   }
 
-  const user = await getSessionUser();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const profile = await getProfile();
-  if (!profile) redirect("/login");
-
-  const supabase = await createClient();
-  const { data: company } = await supabase
-    .from("companies")
-    .select("name")
-    .eq("id", profile.company_id)
+  const { data: profileRow } = await supabase
+    .from("profiles")
+    .select("*, companies(name)")
+    .eq("id", user.id)
     .single();
+  if (!profileRow) redirect("/login");
 
-  let dbOk = true;
-  try {
-    const health = await checkDbHealth();
-    dbOk = health.ok;
-  } catch {
-    dbOk = false;
-  }
+  const profile = profileRow as typeof profileRow & {
+    companies: { name: string } | null;
+  };
+  const companyName = profile.companies?.name;
 
   return (
-    <AppShell userName={profile.name} companyName={company?.name}>
-      <DbSetupBanner show={!dbOk} />
+    <AppShell userName={profile.name} companyName={companyName}>
+      <DbSetupBanner />
       {children}
     </AppShell>
   );

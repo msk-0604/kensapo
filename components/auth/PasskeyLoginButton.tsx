@@ -32,8 +32,7 @@ export function PasskeyLoginButton({
     try {
       const { error: authError } = await supabase.auth.signInWithPasskey();
       if (authError) throw authError;
-      router.push("/dashboard");
-      router.refresh();
+      router.replace("/dashboard");
     } catch (err) {
       setError(getPasskeyErrorMessage(err));
     } finally {

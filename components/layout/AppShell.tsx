@@ -28,8 +28,7 @@ export function AppShell({
   async function handleLogout() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/login");
-    router.refresh();
+    router.replace("/login");
   }
 
   if (isPrintView) {

@@ -68,8 +68,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
           "ログインがタイムアウトしました。通信環境を確認してください。"
         );
         if (authError) throw authError;
-        router.push("/dashboard");
-        router.refresh();
+        router.replace("/dashboard");
         return;
       }
 
@@ -117,8 +116,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
         throw rpcError;
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      router.replace("/dashboard");
     } catch (err) {
       let message =
         err instanceof Error ? err.message : "エラーが発生しました";

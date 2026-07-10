@@ -90,8 +90,7 @@ export function ScheduleForm({
     }
 
     if (onCancel) onCancel();
-    router.push(`/schedule?date=${form.schedule_date}`);
-    router.refresh();
+    router.replace(`/schedule?date=${form.schedule_date}`);
   }
 
   if (projects.length === 0) {

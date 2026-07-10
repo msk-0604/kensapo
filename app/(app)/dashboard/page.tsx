@@ -13,19 +13,11 @@ import { getProgressChartData } from "@/lib/progress";
 import { formatDate } from "@/lib/utils";
 
 export default async function DashboardPage() {
-  const sites = await getSites();
-  let stats = null;
-  let progressData = null;
-  try {
-    stats = await getDashboardStats();
-  } catch {
-    stats = null;
-  }
-  try {
-    progressData = await getProgressChartData();
-  } catch {
-    progressData = null;
-  }
+  const [sites, stats, progressData] = await Promise.all([
+    getSites(),
+    getDashboardStats().catch(() => null),
+    getProgressChartData().catch(() => null),
+  ]);
 
   return (
     <>

@@ -1,9 +1,27 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
-export function DbSetupBanner({ show }: { show: boolean }) {
+export function DbSetupBanner() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/health/db")
+      .then((res) => res.json())
+      .then((data: { ok?: boolean }) => {
+        if (!cancelled) setShow(!data.ok);
+      })
+      .catch(() => {
+        if (!cancelled) setShow(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   if (!show) return null;
 
   return (
