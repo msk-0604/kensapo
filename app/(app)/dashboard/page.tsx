@@ -59,7 +59,7 @@ export default async function DashboardPage() {
               </Card>
               <Card className="!p-5 text-center">
                 <p className="text-base font-bold text-gray-600">
-                  今日の作業員
+                  今日の予定
                 </p>
                 <p className="mt-2 text-4xl font-bold text-navy-950">
                   {stats.todayWorkerCount}

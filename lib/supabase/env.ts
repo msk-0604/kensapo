@@ -15,7 +15,7 @@ export const SUPABASE_ENV_KEYS = {
 } as const;
 
 export const SUPABASE_ENV_SETUP_MESSAGE =
-  "Supabase の環境変数が未設定です。ローカルでは .env.local に、Vercel では Project Settings → Environment Variables に NEXT_PUBLIC_SUPABASE_URL と NEXT_PUBLIC_SUPABASE_ANON_KEY を設定してください。";
+  "アプリの接続設定が完了していません。管理者にお問い合わせください。";
 
 export function getSupabasePublicEnv():
   | { url: string; anonKey: string }

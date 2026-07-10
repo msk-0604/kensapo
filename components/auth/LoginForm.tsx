@@ -88,14 +88,14 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
           },
         }),
         20000,
-        "登録がタイムアウトしました。Supabaseの設定を確認してください。"
+        "登録がタイムアウトしました。しばらく待ってからもう一度お試しください。"
       );
       if (signUpError) throw signUpError;
       if (!signUpData.user) throw new Error("登録に失敗しました");
 
       if (!signUpData.session) {
         throw new Error(
-          "確認メールを送信しました。メールのリンクを開いてから、ログインしてください。※すぐ使う場合は Supabase でメール確認を OFF にしてください。"
+          "確認メールを送信しました。メールのリンクを開いてから、ログインしてください。"
         );
       }
 
@@ -120,8 +120,12 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
       router.push("/dashboard");
       router.refresh();
     } catch (err) {
-      const message =
+      let message =
         err instanceof Error ? err.message : "エラーが発生しました";
+      if (message.includes("User already registered")) {
+        message =
+          "このメールアドレスはすでに登録済みです。ログインタブからログインしてください。";
+      }
       setError(message);
     } finally {
       setLoading(false);
@@ -136,7 +140,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
             <ClipboardList className="h-7 w-7 text-white" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-navy-950">
-            Kensapo
+            ケンサポ
           </h1>
           <p className="mt-2 text-sm text-gray-500">
             現場の日報・写真・報告書を、ここで。
@@ -205,7 +209,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            minLength={6}
+            minLength={8}
             autoComplete={
               mode === "login" ? "current-password" : "new-password"
             }

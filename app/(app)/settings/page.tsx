@@ -6,6 +6,12 @@ import { PasskeySettings } from "@/components/auth/PasskeySettings";
 import { getProfile, getSessionUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
+const ROLE_LABELS: Record<string, string> = {
+  admin: "管理者",
+  manager: "現場監督",
+  worker: "作業員",
+};
+
 export default async function SettingsPage() {
   const user = await getSessionUser();
   const profile = await getProfile();
@@ -69,7 +75,9 @@ export default async function SettingsPage() {
             </section>
             <section>
               <dt className="text-gray-500">権限</dt>
-              <dd className="font-medium">{profile.role}</dd>
+              <dd className="font-medium">
+                {ROLE_LABELS[profile.role] ?? profile.role}
+              </dd>
             </section>
           </dl>
         </Card>
