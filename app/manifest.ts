@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "建設現場の日報・写真整理・AI報告書作成を一元化",
     start_url: "/dashboard",
     display: "standalone",
-    background_color: "#0144BC",
-    theme_color: "#0144BC",
+    background_color: "#000000",
+    theme_color: "#000000",
     icons: [
       {
         src: "/icon.png",

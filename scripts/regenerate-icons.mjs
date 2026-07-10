@@ -5,25 +5,8 @@ import pngToIco from "png-to-ico";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const SOURCES = [
+  path.join(ROOT, "scripts", "logo-original.jpg"),
   path.join(ROOT, "scripts", "logo-source.png"),
-  path.join(
-    ROOT,
-    "..",
-    ".cursor",
-    "projects",
-    "c-dev-kensapo",
-    "assets",
-    "c__Users_user_AppData_Roaming_Cursor_User_workspaceStorage_8ebe11fb22a31732e10e5fbe8c9536c7_images_image-6982890e-10b5-4924-8850-a9bf62b93c75.png"
-  ),
-  path.join(
-    ROOT,
-    "..",
-    ".cursor",
-    "projects",
-    "c-dev-kensapo",
-    "assets",
-    "c__Users_user_AppData_Roaming_Cursor_User_workspaceStorage_8ebe11fb22a31732e10e5fbe8c9536c7_images_image-6a6a0d22-e51b-4ac5-8757-a75e13faa281.png"
-  ),
   path.join(ROOT, "app", "icon.png"),
 ];
 
@@ -36,7 +19,11 @@ async function extractIconFromSource(input) {
   let textStartY = info.height;
   for (let y = Math.floor(info.height * 0.42); y < info.height; y++) {
     let bright = 0;
-    for (let x = Math.floor(info.width * 0.18); x < Math.floor(info.width * 0.82); x++) {
+    for (
+      let x = Math.floor(info.width * 0.18);
+      x < Math.floor(info.width * 0.82);
+      x++
+    ) {
       const i = (y * info.width + x) * info.channels;
       if (data[i] > 200 && data[i + 1] > 200 && data[i + 2] > 200) {
         bright++;
@@ -70,7 +57,7 @@ async function extractIconFromSource(input) {
 
   const width = maxX - minX + 1;
   const height = maxY - minY + 1;
-  const side = Math.round(Math.max(width, height) * 1.12);
+  const side = Math.round(Math.max(width, height) * 1.05);
   const centerX = Math.round((minX + maxX) / 2);
   const centerY = Math.round((minY + maxY) / 2);
   const left = Math.max(0, centerX - Math.floor(side / 2));
@@ -109,24 +96,29 @@ async function main() {
 
   const icon512 = await buildSquareIcon(512, logo);
   const icon180 = await buildSquareIcon(180, logo);
+  const sizes = [16, 32, 48, 64, 128, 256];
 
   fs.writeFileSync(path.join(ROOT, "app", "icon.png"), icon512);
   fs.writeFileSync(path.join(ROOT, "app", "apple-icon.png"), icon180);
 
-  const sizes = [16, 32, 48, 64, 128, 256];
+  const pngPaths = [];
   const tmpDir = path.join(ROOT, ".tmp-icons");
   fs.mkdirSync(tmpDir, { recursive: true });
-  const pngPaths = [];
   for (const size of sizes) {
     const filePath = path.join(tmpDir, `${size}.png`);
     fs.writeFileSync(filePath, await buildSquareIcon(size, logo));
     pngPaths.push(filePath);
   }
 
-  fs.writeFileSync(path.join(ROOT, "app", "favicon.ico"), await pngToIco(pngPaths));
+  const ico = await pngToIco(pngPaths);
+  fs.writeFileSync(path.join(ROOT, "app", "favicon.ico"), ico);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 
-  console.log("Icons regenerated from latest logo source.");
+  console.log("icon.png", fs.statSync(path.join(ROOT, "app", "icon.png")).size);
+  console.log(
+    "favicon.ico",
+    fs.statSync(path.join(ROOT, "app", "favicon.ico")).size
+  );
 }
 
 main().catch((error) => {
