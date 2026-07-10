@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 
@@ -9,8 +9,16 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "KenSapo",
-  description:
-    "建設現場の日報・写真整理・AI報告書作成を一元化",
+  description: "建設現場の日報・写真整理・AI報告書作成を一元化",
+  appleWebApp: {
+    capable: true,
+    title: "KenSapo",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0144BC",
 };
 
 export default function RootLayout({

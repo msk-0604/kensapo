@@ -36,8 +36,22 @@ export function DashboardTodaySchedules({
     router.refresh();
   }
 
+  async function quickEnd(id: string) {
+    const supabase = createClient();
+    const now = nowISO();
+    await supabase
+      .from("schedules")
+      .update({
+        actual_end_time: now,
+        status: "completed",
+        updated_at: now,
+      })
+      .eq("id", id);
+    router.refresh();
+  }
+
   return (
-    <section className="mb-8">
+    <section className="mb-2">
       <h2 className="mb-4 text-xl font-bold text-gray-800">今日の予定</h2>
       <ul className="space-y-4">
         {schedules.map((s) => {
@@ -70,7 +84,7 @@ export function DashboardTodaySchedules({
                   </p>
                 ) : null}
                 {s.schedule_date === todayISO() && s.status !== "completed" ? (
-                  <div className="mt-4">
+                  <div className="mt-5 space-y-3">
                     <Button
                       type="button"
                       fullWidth
@@ -79,6 +93,18 @@ export function DashboardTodaySchedules({
                       onClick={() => quickStart(s.id)}
                     >
                       {s.status === "in_progress" ? "作業中です" : "作業を開始する"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      fullWidth
+                      size="lg"
+                      disabled={
+                        !s.actual_start_time && s.status !== "in_progress"
+                      }
+                      onClick={() => quickEnd(s.id)}
+                    >
+                      作業を終了する
                     </Button>
                   </div>
                 ) : null}

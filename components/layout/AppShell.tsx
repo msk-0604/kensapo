@@ -46,15 +46,15 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-lg flex-1 px-5 py-8 pb-28">
+      <main className="mx-auto w-full max-w-lg flex-1 overflow-x-hidden px-5 py-8 pb-[calc(7.5rem+env(safe-area-inset-bottom))]">
         {children}
       </main>
 
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-gray-200 bg-white pb-[env(safe-area-inset-bottom)]"
+        className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-gray-200 bg-white shadow-[0_-4px_16px_rgba(15,23,41,0.06)] pb-[env(safe-area-inset-bottom)]"
         aria-label="メインメニュー"
       >
-        <div className="mx-auto grid max-w-lg grid-cols-4 gap-2 px-3 py-3">
+        <div className="mx-auto grid max-w-lg grid-cols-4 gap-2 px-3 pb-3 pt-3">
           {navItems.map(({ href, label, Icon }) => {
             const active =
               pathname === href || pathname.startsWith(`${href}/`);

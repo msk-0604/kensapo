@@ -125,19 +125,19 @@ export default async function DashboardPage() {
           ) : null}
 
           {stats ? (
-            <DashboardTodaySchedules schedules={stats.todaySchedules} />
-          ) : null}
-
-          {stats ? (
             <DashboardSiteProgress
               summaries={stats.siteProgressSummaries}
             />
           ) : null}
 
-          {progressData ? <ProgressCharts data={progressData} /> : null}
+          {progressData ? (
+            <div className="mb-8 hidden sm:block">
+              <ProgressCharts data={progressData} />
+            </div>
+          ) : null}
 
           {stats && stats.latestPhotos.length > 0 ? (
-            <section className="mb-8">
+            <section className="mb-8 hidden sm:block">
               <h2 className="mb-4 text-xl font-bold text-gray-800">
                 最新の写真
               </h2>
@@ -161,7 +161,7 @@ export default async function DashboardPage() {
           ) : null}
 
           {stats && stats.latestReports.length > 0 ? (
-            <section className="mb-8">
+            <section className="mb-8 hidden sm:block">
               <h2 className="mb-4 text-xl font-bold text-gray-800">
                 最新の報告書
               </h2>
@@ -184,6 +184,10 @@ export default async function DashboardPage() {
                 ))}
               </ul>
             </section>
+          ) : null}
+
+          {stats ? (
+            <DashboardTodaySchedules schedules={stats.todaySchedules} />
           ) : null}
         </>
       )}

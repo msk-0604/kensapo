@@ -31,8 +31,8 @@ export function ProgressCharts({ data }: { data: ProgressChartData }) {
           <h3 className="mb-4 text-base font-bold text-gray-600">
             現場の状態
           </h3>
-          <div className="h-52">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-52 min-w-0 overflow-hidden">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <PieChart>
                 <Pie
                   data={data.statusChart}
@@ -108,8 +108,8 @@ export function ProgressCharts({ data }: { data: ProgressChartData }) {
           <h3 className="mb-4 text-base font-bold text-gray-600">
             週ごとの日報提出数
           </h3>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
+          <div className="h-48 min-w-0 overflow-hidden">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={data.weeklyReports}>
                 <XAxis dataKey="label" tick={{ fontSize: 14 }} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 14 }} />
