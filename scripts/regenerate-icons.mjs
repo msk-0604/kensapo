@@ -13,65 +13,100 @@ const SOURCES = [
     "projects",
     "c-dev-kensapo",
     "assets",
+    "c__Users_user_AppData_Roaming_Cursor_User_workspaceStorage_8ebe11fb22a31732e10e5fbe8c9536c7_images_image-6982890e-10b5-4924-8850-a9bf62b93c75.png"
+  ),
+  path.join(
+    ROOT,
+    "..",
+    ".cursor",
+    "projects",
+    "c-dev-kensapo",
+    "assets",
     "c__Users_user_AppData_Roaming_Cursor_User_workspaceStorage_8ebe11fb22a31732e10e5fbe8c9536c7_images_image-6a6a0d22-e51b-4ac5-8757-a75e13faa281.png"
   ),
   path.join(ROOT, "app", "icon.png"),
 ];
-const BLUE = { r: 1, g: 68, b: 188 };
 
-async function loadLogoBuffer() {
-  const input = SOURCES.find((candidate) => fs.existsSync(candidate));
-  if (!input) {
-    throw new Error("Icon source image not found.");
-  }
+async function extractIconFromSource(input) {
   const { data, info } = await sharp(input)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  const pixels = Buffer.from(data);
-  for (let i = 0; i < pixels.length; i += 4) {
-    const r = pixels[i];
-    const g = pixels[i + 1];
-    const b = pixels[i + 2];
-    if (r > 235 && g > 235 && b > 235) {
-      pixels[i + 3] = 0;
+  let textStartY = info.height;
+  for (let y = Math.floor(info.height * 0.42); y < info.height; y++) {
+    let bright = 0;
+    for (let x = Math.floor(info.width * 0.18); x < Math.floor(info.width * 0.82); x++) {
+      const i = (y * info.width + x) * info.channels;
+      if (data[i] > 200 && data[i + 1] > 200 && data[i + 2] > 200) {
+        bright++;
+      }
+    }
+    if (bright > 40) {
+      textStartY = y;
+      break;
     }
   }
 
-  return sharp(pixels, {
-    raw: { width: info.width, height: info.height, channels: 4 },
-  })
-    .trim()
+  let minX = info.width;
+  let maxX = 0;
+  let minY = info.height;
+  let maxY = 0;
+
+  for (let y = 0; y < textStartY - 8; y++) {
+    for (let x = 0; x < info.width; x++) {
+      const i = (y * info.width + x) * info.channels;
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      if (r < 20 && g < 20 && b < 20) continue;
+      if (r > 245 && g > 245 && b > 245) continue;
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+  }
+
+  const width = maxX - minX + 1;
+  const height = maxY - minY + 1;
+  const side = Math.round(Math.max(width, height) * 1.12);
+  const centerX = Math.round((minX + maxX) / 2);
+  const centerY = Math.round((minY + maxY) / 2);
+  const left = Math.max(0, centerX - Math.floor(side / 2));
+  const top = Math.max(0, centerY - Math.floor(side / 2));
+
+  return sharp(input)
+    .extract({
+      left,
+      top,
+      width: Math.min(side, info.width - left),
+      height: Math.min(side, info.height - top),
+    })
     .png()
     .toBuffer();
 }
 
 async function buildSquareIcon(size, logo) {
-  const logoSize = Math.round(size * 0.88);
-  const resizedLogo = await sharp(logo)
-    .resize(logoSize, logoSize, {
+  return sharp(logo)
+    .resize(size, size, {
       fit: "contain",
-      background: { r: 0, g: 0, b: 0, alpha: 0 },
+      background: { r: 0, g: 0, b: 0, alpha: 1 },
     })
-    .png()
-    .toBuffer();
-
-  return sharp({
-    create: {
-      width: size,
-      height: size,
-      channels: 3,
-      background: BLUE,
-    },
-  })
-    .composite([{ input: resizedLogo, gravity: "center" }])
     .png()
     .toBuffer();
 }
 
 async function main() {
-  const logo = await loadLogoBuffer();
+  const input = SOURCES.find((candidate) => fs.existsSync(candidate));
+  if (!input) {
+    throw new Error("Icon source image not found.");
+  }
+
+  const logo = await extractIconFromSource(input);
+  fs.mkdirSync(path.join(ROOT, "scripts"), { recursive: true });
+  fs.writeFileSync(path.join(ROOT, "scripts", "logo-source.png"), logo);
+
   const icon512 = await buildSquareIcon(512, logo);
   const icon180 = await buildSquareIcon(180, logo);
 
@@ -91,7 +126,7 @@ async function main() {
   fs.writeFileSync(path.join(ROOT, "app", "favicon.ico"), await pngToIco(pngPaths));
   fs.rmSync(tmpDir, { recursive: true, force: true });
 
-  console.log("Icons regenerated with full-bleed blue background.");
+  console.log("Icons regenerated from latest logo source.");
 }
 
 main().catch((error) => {
