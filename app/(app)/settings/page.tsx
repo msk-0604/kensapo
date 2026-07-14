@@ -38,13 +38,6 @@ export default async function SettingsPage() {
         <ActionLink href="/workers" description="作業員の登録・一覧">
           作業員を管理する
         </ActionLink>
-        <ActionLink
-          href="/ai-reports"
-          variant="secondary"
-          description="作成済みのAI報告書を見る"
-        >
-          AI報告書一覧
-        </ActionLink>
       </section>
 
       <section className="space-y-4">
@@ -88,7 +81,7 @@ export default async function SettingsPage() {
 
         <Card className="!bg-navy-900/5">
           <p className="text-lg text-gray-600">
-            KenSapo — 現場の日報・写真・報告書を一元管理
+            KenSapo — 建設業向け 現場スケジュール管理システム
           </p>
         </Card>
 

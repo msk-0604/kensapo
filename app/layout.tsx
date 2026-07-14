@@ -9,7 +9,7 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "KenSapo",
-  description: "建設現場の日報・写真整理・AI報告書作成を一元化",
+  description: "建設業向け 現場スケジュール管理システム",
   icons: {
     icon: [
       { url: "/icon.png", type: "image/png", sizes: "512x512" },

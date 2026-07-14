@@ -60,7 +60,7 @@ supabase/migrations/
 | /sites/[id]/photos | 写真追加 |
 | /sites/[id]/reports | 日報一覧 |
 | /sites/[id]/reports/new | 日報作成 |
-| /sites/[id]/reports/[id]/generate | AI報告書・編集 |
+| /sites/[id]/reports/[id]/generate | （廃止・日報一覧へ誘導） |
 | /workers | 作業員一覧 |
 | /workers/new | 作業員登録 |
 | /schedule | 今日の予定 + 予定登録 |

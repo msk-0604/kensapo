@@ -61,22 +61,18 @@ export function DailyReportForm({
     void notifyCompanyUpdate({
       title: "日報が提出されました",
       body: `${projectName}（${form.report_date}）`,
-      url: `/sites/${projectId}/reports/${data.id}/generate`,
+      url: `/sites/${projectId}/reports`,
       tag: `report-${data.id}`,
     });
 
-    router.replace(
-      `/sites/${projectId}/reports/${data.id}/generate?name=${encodeURIComponent(projectName)}`
-    );
+    router.replace(`/sites/${projectId}/reports`);
   }
 
   return (
     <>
       <HintBox>
         <p className="font-bold">「{projectName}」の日報を書きます</p>
-        <p className="mt-1">
-          今日の作業内容を入力して保存すると、お客様向けの報告書を自動で作成します。
-        </p>
+        <p className="mt-1">今日の作業内容を入力して保存してください。</p>
       </HintBox>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -145,7 +141,7 @@ export function DailyReportForm({
           </p>
         ) : null}
         <Button type="submit" fullWidth loading={loading}>
-          {loading ? "日報を保存しています" : "日報を保存して報告書を作る"}
+          {loading ? "日報を保存しています" : "日報を保存する"}
         </Button>
       </form>
     </>

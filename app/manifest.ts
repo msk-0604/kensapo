@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "KenSapo",
     short_name: "KenSapo",
-    description: "建設現場の日報・写真整理・AI報告書作成を一元化",
+    description: "建設業向け 現場スケジュール管理システム",
     start_url: "/dashboard",
     display: "standalone",
     background_color: "#000000",

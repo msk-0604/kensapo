@@ -140,7 +140,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
             KenSapo
           </h1>
           <p className="mt-2 text-lg text-gray-600">
-            現場の日報・写真・報告書を、ここで。
+            現場の予定・日報・写真を、ここで。
           </p>
         </div>
 

@@ -209,7 +209,7 @@ export default async function SiteDetailPage({
         <ActionLink
           href={`/sites/${id}/reports`}
           variant="secondary"
-          description="過去の日報と報告書を見る"
+          description="過去の日報を見る"
         >
           日報一覧を見る
         </ActionLink>

@@ -152,30 +152,6 @@ export async function DashboardDetails() {
         </section>
       ) : null}
 
-      {stats && stats.latestReports.length > 0 ? (
-        <section className="mb-8 hidden sm:block">
-          <h2 className="mb-4 text-xl font-bold text-gray-800">最新の報告書</h2>
-          <ul className="space-y-3">
-            {stats.latestReports.map((report) => (
-              <li key={report.id}>
-                <Link
-                  href={`/sites/${report.project_id}/reports/${report.id}/generate`}
-                >
-                  <Card className="!p-4">
-                    <p className="text-lg font-bold text-navy-950">
-                      {report.project_name}
-                    </p>
-                    <p className="mt-1 text-base text-gray-500">
-                      作業日：{formatDate(report.report_date)}
-                    </p>
-                  </Card>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
       {stats ? (
         <DashboardTodaySchedules schedules={stats.todaySchedules} />
       ) : null}

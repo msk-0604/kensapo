@@ -45,7 +45,7 @@ export default async function SiteReportsPage({
       {!reports?.length ? (
         <EmptyState
           title="日報がまだありません"
-          description="今日の作業内容を記録して、お客様向けの報告書を作成できます。"
+          description="今日の作業内容を記録できます。"
           action={
             <Link href={`/sites/${id}/reports/new`}>
               <Button fullWidth>日報を書く</Button>
@@ -60,49 +60,42 @@ export default async function SiteReportsPage({
             return (
               <li key={report.id}>
                 <Card>
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-lg font-bold text-navy-950">
-                        作業日：{formatDate(report.report_date)}
-                      </p>
-                      <p className="mt-2 text-base text-gray-600 line-clamp-2">
-                        {report.work_content || "作業内容なし"}
-                      </p>
-                      {missing ? (
-                        <p className="mt-2 text-base font-bold text-amber-700">
-                          未提出の日報です
-                        </p>
-                      ) : null}
-                    </div>
-                    {report.ai_report ? (
-                      <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-sm font-bold text-emerald-800">
-                        報告書あり
-                      </span>
-                    ) : (
-                      <span className="shrink-0 rounded-full bg-gray-100 px-3 py-1 text-sm font-bold text-gray-600">
-                        報告書なし
-                      </span>
-                    )}
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    {report.ai_report ? (
-                      <Link
-                        href={`/sites/${id}/reports/${report.id}/generate`}
-                      >
-                        <Button variant="secondary" fullWidth size="md">
-                          報告書を見る・編集する
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/sites/${id}/reports/${report.id}/generate`}
-                      >
-                        <Button fullWidth size="md">
-                          報告書を作る
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
+                  <p className="text-lg font-bold text-navy-950">
+                    作業日：{formatDate(report.report_date)}
+                  </p>
+                  {report.weather ? (
+                    <p className="mt-1 text-base text-gray-600">
+                      天気：{report.weather}
+                    </p>
+                  ) : null}
+                  {report.workers_count != null ? (
+                    <p className="mt-1 text-base text-gray-600">
+                      人数：{report.workers_count}人
+                    </p>
+                  ) : null}
+                  <p className="mt-2 text-base text-gray-800 whitespace-pre-wrap">
+                    {report.work_content || "作業内容なし"}
+                  </p>
+                  {report.materials ? (
+                    <p className="mt-2 text-base text-gray-600">
+                      材料：{report.materials}
+                    </p>
+                  ) : null}
+                  {report.issues ? (
+                    <p className="mt-2 text-base text-gray-600">
+                      問題点：{report.issues}
+                    </p>
+                  ) : null}
+                  {report.next_plan ? (
+                    <p className="mt-2 text-base text-gray-600">
+                      明日の予定：{report.next_plan}
+                    </p>
+                  ) : null}
+                  {missing ? (
+                    <p className="mt-2 text-base font-bold text-amber-700">
+                      未提出の日報です
+                    </p>
+                  ) : null}
                 </Card>
               </li>
             );
