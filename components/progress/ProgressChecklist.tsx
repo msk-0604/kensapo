@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { notifyCompanyUpdate } from "@/lib/push/client";
 import type { ProjectProgressItem } from "@/types/database";
 
 type GroupedItems = {
@@ -77,6 +78,13 @@ export function ProgressChecklist({
       window.alert(error.message);
       return;
     }
+
+    void notifyCompanyUpdate({
+      title: checked ? "工事進行チェック済み" : "工事進行チェックを戻しました",
+      body: item.item_name,
+      url: `/sites/${projectId}/progress`,
+      tag: `progress-${item.id}`,
+    });
 
     setItems((prev) =>
       prev.map((i) =>

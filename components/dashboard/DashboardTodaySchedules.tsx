@@ -11,6 +11,7 @@ import {
   nowISO,
   todayISO,
 } from "@/lib/utils";
+import { notifyCompanyUpdate } from "@/lib/push/client";
 import type { ScheduleWithDetails } from "@/lib/schedules";
 
 export function DashboardTodaySchedules({
@@ -23,6 +24,8 @@ export function DashboardTodaySchedules({
   if (schedules.length === 0) return null;
 
   async function quickStart(id: string) {
+    const schedule = schedules.find((s) => s.id === id);
+    const title = schedule?.title || schedule?.project_name || "作業";
     const supabase = createClient();
     const now = nowISO();
     await supabase
@@ -33,10 +36,18 @@ export function DashboardTodaySchedules({
         updated_at: now,
       })
       .eq("id", id);
+    void notifyCompanyUpdate({
+      title: "作業を開始しました",
+      body: `${title} の作業が始まりました`,
+      url: "/schedule",
+      tag: `schedule-start-${id}`,
+    });
     router.refresh();
   }
 
   async function quickEnd(id: string) {
+    const schedule = schedules.find((s) => s.id === id);
+    const title = schedule?.title || schedule?.project_name || "作業";
     const supabase = createClient();
     const now = nowISO();
     await supabase
@@ -47,6 +58,12 @@ export function DashboardTodaySchedules({
         updated_at: now,
       })
       .eq("id", id);
+    void notifyCompanyUpdate({
+      title: "作業を終了しました",
+      body: `${title} の作業が終わりました`,
+      url: "/schedule",
+      tag: `schedule-end-${id}`,
+    });
     router.refresh();
   }
 

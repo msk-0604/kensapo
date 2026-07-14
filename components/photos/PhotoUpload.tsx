@@ -9,6 +9,7 @@ import {
   buildStoragePath,
   validatePhotoFile,
 } from "@/lib/security/upload";
+import { notifyCompanyUpdate } from "@/lib/push/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -123,6 +124,13 @@ export function PhotoUpload({
       });
 
       if (insertError) throw insertError;
+
+      void notifyCompanyUpdate({
+        title: "現場写真が追加されました",
+        body: safeTitle || "新しい写真が保存されました",
+        url: `/sites/${projectId}/photos`,
+        tag: `photo-${projectId}`,
+      });
 
       setTitle("");
       setComment("");

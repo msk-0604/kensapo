@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/Card";
 import { ActionLink } from "@/components/ui/ActionLink";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { PasskeySettings } from "@/components/auth/PasskeySettings";
+import { NotificationSettings } from "@/components/settings/NotificationSettings";
 import { getProfile, getSessionUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -47,6 +48,8 @@ export default async function SettingsPage() {
       </section>
 
       <section className="space-y-4">
+        <NotificationSettings />
+
         <PasskeySettings />
 
         <Card>

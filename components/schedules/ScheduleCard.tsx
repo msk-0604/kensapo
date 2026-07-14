@@ -12,6 +12,7 @@ import {
   nowISO,
   todayISO,
 } from "@/lib/utils";
+import { notifyCompanyUpdate } from "@/lib/push/client";
 import type { ScheduleWithDetails } from "@/lib/schedules";
 
 export function ScheduleCard({
@@ -55,6 +56,12 @@ export function ScheduleCard({
       return;
     }
     setError("");
+    void notifyCompanyUpdate({
+      title: "作業を開始しました",
+      body: `${displayTitle} の作業が始まりました`,
+      url: "/schedule",
+      tag: `schedule-start-${schedule.id}`,
+    });
     router.refresh();
   }
 
@@ -76,6 +83,12 @@ export function ScheduleCard({
       return;
     }
     setError("");
+    void notifyCompanyUpdate({
+      title: "作業を終了しました",
+      body: `${displayTitle} の作業が終わりました`,
+      url: "/schedule",
+      tag: `schedule-end-${schedule.id}`,
+    });
     router.refresh();
   }
 

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { todayISO } from "@/lib/utils";
+import { notifyCompanyUpdate } from "@/lib/push/client";
 import type { Project, Worker } from "@/types/database";
 import type { ScheduleWithDetails } from "@/lib/schedules";
 
@@ -90,6 +91,16 @@ export function ScheduleForm({
     }
 
     if (onCancel) onCancel();
+    const projectName =
+      projects.find((p) => p.id === form.project_id)?.name || "現場";
+    void notifyCompanyUpdate({
+      title: schedule ? "予定を変更しました" : "新しい予定が入りました",
+      body: `${form.schedule_date} / ${projectName}${
+        form.title.trim() ? `：${form.title.trim()}` : ""
+      }`,
+      url: `/schedule?date=${form.schedule_date}`,
+      tag: `schedule-${schedule?.id ?? "new"}`,
+    });
     router.replace(`/schedule?date=${form.schedule_date}`);
   }
 

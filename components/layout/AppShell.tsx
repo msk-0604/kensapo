@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Calendar, Home, MapPin, Settings } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import { registerPushServiceWorker } from "@/lib/push/client";
 
 const navItems = [
   { href: "/dashboard", label: "ホーム", Icon: Home },
@@ -29,6 +30,10 @@ export function AppShell({
   const [userName, setUserName] = useState(initialUserName ?? "");
   const [companyName, setCompanyName] = useState(initialCompanyName ?? "");
   const isPrintView = pathname.includes("/pdf");
+
+  useEffect(() => {
+    void registerPushServiceWorker();
+  }, []);
 
   useEffect(() => {
     if (initialUserName) return;

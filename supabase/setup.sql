@@ -80,6 +80,19 @@ CREATE TABLE IF NOT EXISTS schedules (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  user_agent TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT push_subscriptions_endpoint_unique UNIQUE (endpoint)
+);
+
 CREATE TABLE IF NOT EXISTS project_progress_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   company_id UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
@@ -200,6 +213,7 @@ RETURNS UUID
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
+
 AS $$
 DECLARE
   new_company_id UUID;
@@ -243,6 +257,7 @@ ALTER TABLE daily_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE schedules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE project_progress_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
 
 -- =============================================================================
 -- RLS policies: companies / profiles
@@ -410,6 +425,30 @@ DROP POLICY IF EXISTS "schedules_delete" ON schedules;
 CREATE POLICY "schedules_delete" ON schedules
   FOR DELETE USING (company_id = public.get_my_company_id());
 
+ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "push_subscriptions_select" ON push_subscriptions;
+CREATE POLICY "push_subscriptions_select" ON push_subscriptions
+  FOR SELECT USING (company_id = public.get_my_company_id());
+
+DROP POLICY IF EXISTS "push_subscriptions_insert" ON push_subscriptions;
+CREATE POLICY "push_subscriptions_insert" ON push_subscriptions
+  FOR INSERT WITH CHECK (
+    user_id = auth.uid()
+    AND company_id = public.get_my_company_id()
+  );
+
+DROP POLICY IF EXISTS "push_subscriptions_update" ON push_subscriptions;
+CREATE POLICY "push_subscriptions_update" ON push_subscriptions
+  FOR UPDATE USING (user_id = auth.uid());
+
+DROP POLICY IF EXISTS "push_subscriptions_delete" ON push_subscriptions;
+CREATE POLICY "push_subscriptions_delete" ON push_subscriptions
+  FOR DELETE USING (
+    user_id = auth.uid()
+    OR company_id = public.get_my_company_id()
+  );
+
 DROP POLICY IF EXISTS "progress_items_select" ON project_progress_items;
 CREATE POLICY "progress_items_select" ON project_progress_items
   FOR SELECT USING (company_id = public.get_my_company_id());
@@ -440,6 +479,8 @@ CREATE INDEX IF NOT EXISTS idx_schedules_project_id ON schedules(project_id);
 CREATE INDEX IF NOT EXISTS idx_schedules_status ON schedules(status);
 CREATE INDEX IF NOT EXISTS idx_progress_items_project_id ON project_progress_items(project_id);
 CREATE INDEX IF NOT EXISTS idx_progress_items_company_id ON project_progress_items(company_id);
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_company_id ON push_subscriptions(company_id);
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user_id ON push_subscriptions(user_id);
 
 -- =============================================================================
 -- Storage: site-photos bucket + policies

@@ -9,6 +9,7 @@ import { PROJECT_STATUS_LABELS } from "@/lib/constants";
 import { LIMITS } from "@/lib/security/validation";
 import { createClient } from "@/lib/supabase/client";
 import { seedProgressItemsClient } from "@/components/progress/SeedProgressButton";
+import { notifyCompanyUpdate } from "@/lib/push/client";
 
 type Props = {
   project?: Project;
@@ -69,6 +70,12 @@ export function ProjectForm({ project, companyId }: Props) {
           .update(payload)
           .eq("id", project.id);
         if (updateError) throw updateError;
+        void notifyCompanyUpdate({
+          title: "現場情報を更新しました",
+          body: `${form.name} の内容が変更されました`,
+          url: `/sites/${project.id}`,
+          tag: `site-${project.id}`,
+        });
         router.replace(`/sites/${project.id}`);
       } else {
         const { data, error: insertError } = await supabase
@@ -77,6 +84,12 @@ export function ProjectForm({ project, companyId }: Props) {
           .select()
           .single();
         if (insertError) throw insertError;
+        void notifyCompanyUpdate({
+          title: "新しい現場が登録されました",
+          body: form.name,
+          url: `/sites/${data.id}`,
+          tag: `site-${data.id}`,
+        });
         router.replace(`/sites/${data.id}`);
         void seedProgressItemsClient(data.id, companyId).catch(() => {});
       }

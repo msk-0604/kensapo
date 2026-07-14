@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { WEATHER_OPTIONS } from "@/lib/constants";
 import { LIMITS } from "@/lib/security/validation";
 import { todayISO } from "@/lib/utils";
+import { notifyCompanyUpdate } from "@/lib/push/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { HintBox } from "@/components/ui/HintBox";
@@ -56,6 +57,13 @@ export function DailyReportForm({
       setError(insertError.message);
       return;
     }
+
+    void notifyCompanyUpdate({
+      title: "日報が提出されました",
+      body: `${projectName}（${form.report_date}）`,
+      url: `/sites/${projectId}/reports/${data.id}/generate`,
+      tag: `report-${data.id}`,
+    });
 
     router.replace(
       `/sites/${projectId}/reports/${data.id}/generate?name=${encodeURIComponent(projectName)}`

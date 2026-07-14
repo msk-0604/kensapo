@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ScheduleForm } from "@/components/schedules/ScheduleForm";
 import { ScheduleCard } from "@/components/schedules/ScheduleCard";
+import { notifyCompanyUpdate } from "@/lib/push/client";
 import type { Project, Worker } from "@/types/database";
 import type { ScheduleWithDetails } from "@/lib/schedules";
 
@@ -35,6 +36,13 @@ export function ScheduleDayList({
       window.alert(error.message);
       return;
     }
+    const deleted = schedules.find((s) => s.id === id);
+    void notifyCompanyUpdate({
+      title: "予定を削除しました",
+      body: deleted?.title || deleted?.project_name || "予定が削除されました",
+      url: "/schedule",
+      tag: `schedule-delete-${id}`,
+    });
     if (editing?.id === id) setEditing(null);
     router.refresh();
   }
