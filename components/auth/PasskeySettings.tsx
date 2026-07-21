@@ -36,7 +36,9 @@ export function PasskeySettings() {
   }
 
   useEffect(() => {
-    if (supported) void loadPasskeys();
+    if (!supported) return;
+    const timer = window.setTimeout(() => void loadPasskeys(), 0);
+    return () => window.clearTimeout(timer);
   }, [supported]);
 
   async function handleRegister() {

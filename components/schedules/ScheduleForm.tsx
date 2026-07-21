@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
@@ -40,18 +40,6 @@ export function ScheduleForm({
     scheduled_end_time: schedule?.scheduled_end_time?.slice(0, 5) ?? "17:00",
     memo: schedule?.memo ?? "",
   });
-
-  useEffect(() => {
-    if (defaultDate && !schedule) {
-      setForm((f) => ({ ...f, schedule_date: defaultDate }));
-    }
-  }, [defaultDate, schedule]);
-
-  useEffect(() => {
-    if (projects.length && !form.project_id) {
-      setForm((f) => ({ ...f, project_id: projects[0].id }));
-    }
-  }, [projects, form.project_id]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

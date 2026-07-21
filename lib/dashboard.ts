@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getProjects } from "@/lib/projects";
 import { todayISO } from "@/lib/utils";
-import type { DailyReport, Project, SitePhoto } from "@/types/database";
+import type { Project, SitePhoto } from "@/types/database";
 import type { ScheduleWithDetails } from "@/lib/schedules";
 import {
   getInProgressSchedulesForToday,
@@ -15,7 +15,6 @@ export type DashboardStats = {
   missingReportCount: number;
   pendingChecklistCount: number;
   latestPhotos: (SitePhoto & { project_name: string })[];
-  latestReports: (DailyReport & { project_name: string })[];
   todaySchedules: ScheduleWithDetails[];
   inProgressSchedules: ScheduleWithDetails[];
   siteProgressSummaries: Awaited<
@@ -35,7 +34,6 @@ export async function getDashboardStats(
     { count: scheduleCount },
     { data: todayReports },
     { data: photosRaw },
-    { data: reportsRaw },
     todaySchedules,
     inProgressSchedules,
     siteProgressSummaries,
@@ -48,12 +46,6 @@ export async function getDashboardStats(
     supabase
       .from("site_photos")
       .select("*, projects!inner(name)")
-      .order("created_at", { ascending: false })
-      .limit(3),
-    supabase
-      .from("daily_reports")
-      .select("*, projects!inner(name)")
-      .not("ai_report", "is", null)
       .order("created_at", { ascending: false })
       .limit(3),
     getSchedulesForDate(today).catch(() => [] as ScheduleWithDetails[]),
@@ -76,14 +68,6 @@ export async function getDashboardStats(
     };
   });
 
-  const latestReports = (reportsRaw ?? []).map((row) => {
-    const r = row as DailyReport & { projects: { name: string } };
-    return {
-      ...r,
-      project_name: r.projects.name,
-    };
-  });
-
   const pendingChecklistCount = siteProgressSummaries.reduce(
     (sum, s) => sum + s.pending,
     0
@@ -95,7 +79,6 @@ export async function getDashboardStats(
     missingReportCount,
     pendingChecklistCount,
     latestPhotos,
-    latestReports,
     todaySchedules,
     inProgressSchedules,
     siteProgressSummaries,

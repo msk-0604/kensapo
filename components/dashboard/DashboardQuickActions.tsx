@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ActionLink } from "@/components/ui/ActionLink";
 
 export function DashboardQuickActions() {

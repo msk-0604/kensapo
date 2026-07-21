@@ -72,17 +72,6 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith("/login") || pathname.startsWith("/auth");
 
   if (isApi) {
-    if (
-      pathname.startsWith("/api/generate-report") &&
-      request.method === "POST" &&
-      !user
-    ) {
-      const denied = NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
-      return applySecurityHeaders(denied);
-    }
     return applySecurityHeaders(supabaseResponse);
   }
 

@@ -78,7 +78,8 @@ export function PhotoUpload({
   }, [projectId, resolveDisplayUrl]);
 
   useEffect(() => {
-    loadPhotos();
+    const timer = window.setTimeout(() => void loadPhotos(), 0);
+    return () => window.clearTimeout(timer);
   }, [loadPhotos]);
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {

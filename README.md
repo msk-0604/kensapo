@@ -71,6 +71,18 @@ npm run dev
 | `VAPID_PRIVATE_KEY` | Web Push（秘密鍵） |
 | `VAPID_SUBJECT` | Web Push subject |
 
+## 納品資料
+
+`docs/` に次を用意しています。
+
+- 取扱説明書
+- システム仕様書
+- 導入手順書
+- 納品チェックリスト
+- 障害・バックアップ対応手順
+- サービス利用申込書ひな形
+- 納品資料一覧
+
 ## ライセンス
 
 Private

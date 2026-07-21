@@ -1,86 +1,88 @@
-# StarkWorks / Kensapo 設計メモ
+# KenSapo 開発者向け設計メモ
 
-## プロジェクト構成
+## 構成
 
-```
+```text
 app/
-  login/              # ログイン・新規登録
-  register/           # → /login へリダイレクト
-  setup/              # Supabase 未設定時
+  login/                 ログイン・新規登録
+  setup/                 Supabaseセットアップ
   (app)/
-    dashboard/        # ホーム
-    sites/            # 現場（DB: projects）
-    workers/          # 作業員
-    schedule/         # 作業員予定
-    settings/         # 設定
-  api/generate-report/
+    dashboard/           ホーム
+    schedule/            作業予定
+    sites/               現場
+    workers/             作業員
+    settings/            設定
+  api/
+    health/db/           DB疎通
+    push/                通知購読・送信
 
 components/
-  layout/AppShell.tsx
-  projects/ProjectForm.tsx
-  photos/PhotoUpload.tsx
-  reports/DailyReportForm.tsx, GenerateReport.tsx
-  workers/WorkerForm.tsx
-  schedules/ScheduleForm.tsx
-  ui/                 # 共通UI（大きめボタン・戻る）
+  layout/                共通レイアウト
+  projects/              現場フォーム
+  schedules/             予定
+  workers/               作業員
+  photos/                写真
+  reports/               日報
+  progress/              工事進行
+  settings/              通知設定
+  ui/                    共通UI
 
 lib/
-  projects.ts, sites.ts, workers.ts, schedules.ts, dashboard.ts
-  supabase/, auth.ts, security/
-
-supabase/migrations/
-  001_initial_schema.sql
-  002_security_hardening.sql
-  003_starkworks_features.sql   # 作業員・予定
-  004_progress_and_schedule.sql # ★工事進行チェック・行動予定拡張
+  supabase/              Supabaseクライアント
+  push/                  Web Push
+  security/              認証・入力検証
 ```
 
-## DB 設計（Supabase）
+## データ
 
-| 仕様名 | 実テーブル | 備考 |
-|--------|-----------|------|
-| companies | companies | 会社 |
-| profiles | profiles | ユーザー（admin/member） |
-| sites | **projects** | 現場。RLS で company_id 分離 |
-| photos | **site_photos** | title, uploaded_by 追加（003） |
-| daily_reports | daily_reports | created_by, status 追加（003） |
-| workers | **workers** | 003 で新規 |
-| schedules | **schedules** | 003 で新規 |
-| ai_reports | daily_reports.**ai_report** | 別テーブルではなく日報に統合 |
+- `companies`: 会社
+- `profiles`: ユーザー
+- `projects`: 現場（画面上のsites）
+- `workers`: 作業員
+- `schedules`: 作業予定・実績
+- `site_photos`: 写真メタデータ
+- `daily_reports`: 日報
+- `project_progress_items`: 工事進行
+- `push_subscriptions`: 通知購読
 
-## 画面設計
+会社単位の分離はSupabase Row Level Securityで行います。
 
-| パス | 目的 |
-|------|------|
-| /login | ログイン・新規登録 |
-| /dashboard | 今日のサマリー + 4大ボタン |
-| /sites | 現場一覧 |
-| /sites/new | 現場登録 |
-| /sites/[id] | 現場詳細・操作入口 |
-| /sites/[id]/photos | 写真追加 |
-| /sites/[id]/reports | 日報一覧 |
-| /sites/[id]/reports/new | 日報作成 |
-| /sites/[id]/reports/[id]/generate | （廃止・日報一覧へ誘導） |
-| /workers | 作業員一覧 |
-| /workers/new | 作業員登録 |
-| /schedule | 今日の予定 + 予定登録 |
+## URL方針
 
-旧 `/projects` は `/sites` へ永久リダイレクト。
+画面上の現場URLは `/sites` を使用します。旧 `/projects` 配下は互換性のため残っている箇所がありますが、新規導線では使用しません。
 
-## UI 方針
+## UI方針
 
-- 下部ナビ: ホーム / 現場 / 予定 / 設定
-- ボタンは日本語・大きめ・アイコンのみ禁止
-- 戻るボタンを各画面に配置
-- 1画面1目的
+- 60代の利用者を想定した大きな文字とボタン
+- ホーム、予定、現場、設定の下部メニュー
+- アイコンだけの操作を避ける
+- 具体的な日本語ラベル
+- モバイルファースト
+
+## 通知
+
+- `public/sw.js` がService Worker
+- `/api/push/subscribe` が購読登録・解除
+- `/api/push/notify` が同一会社の別ユーザーへ送信
+- VAPID秘密鍵はVercel環境変数で管理
+- 購読情報は `push_subscriptions` に保存
 
 ## セットアップ
 
-Supabase SQL Editor で **003_starkworks_features.sql** を実行してください。
+新規DBは `supabase/setup.sql` を実行します。
 
-### 顔認証・指紋ログイン（Passkey）
+既存DBへ通知だけ追加する場合は `supabase/RUN_PUSH_NOTIFICATIONS.sql` を実行します。
 
-1. Supabase Dashboard → **Authentication → Passkeys** を有効化
-2. Relying Party ID に本番ドメイン（例：`kensapo.vercel.app`）を設定
-3. ユーザーは初回メールログイン後、**設定**から「この端末で顔認証を登録」
-4. 次回からログイン画面の「顔認証・指紋でログイン」が使える（iPhone Face ID / Android 指紋）
+## 品質確認
+
+```bash
+npm run lint
+npm run build
+```
+
+本番確認:
+
+- `/login`
+- `/api/health/db`
+- `/sw.js`
+- `/api/push/subscribe`

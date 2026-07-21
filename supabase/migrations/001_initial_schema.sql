@@ -53,7 +53,6 @@ CREATE TABLE IF NOT EXISTS daily_reports (
   materials TEXT,
   issues TEXT,
   next_plan TEXT,
-  ai_report TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

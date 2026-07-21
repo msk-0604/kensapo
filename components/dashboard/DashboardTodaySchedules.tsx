@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { ScheduleCard } from "@/components/schedules/ScheduleCard";
 import {
   formatDateTimeTime,
   formatTime,

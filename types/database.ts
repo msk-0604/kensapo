@@ -96,11 +96,6 @@ export interface SitePhoto {
   created_at: string;
 }
 
-export interface GenerateReportApiBody {
-  projectId: string;
-  reportId: string;
-}
-
 export interface DailyReport {
   id: string;
   project_id: string;
@@ -111,7 +106,6 @@ export interface DailyReport {
   materials: string | null;
   issues: string | null;
   next_plan: string | null;
-  ai_report: string | null;
   created_by: string | null;
   status: ReportStatus;
   created_at: string;
