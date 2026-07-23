@@ -24,21 +24,33 @@ npm install
 cp .env.example .env.local
 ```
 
+VAPID鍵は次で生成できます。
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+本番では同じ値を Vercel の Environment Variables（Production）へ登録します。
+
 ### 3. Supabase
 
-**新規・未設定の場合（推奨）：** SQL Editor で次の **1ファイルだけ** 実行
+**新規環境（推奨）:** SQL Editor で次を1回実行します。
 
 ```
-supabase/RUN_THIS_IN_SUPABASE.sql
+supabase/setup.sql
 ```
 
-またはアプリの **/setup** ページから SQL をコピーして実行。
+またはアプリの `/setup` ページから SQL をコピーして実行します。
 
-通知機能を使う場合は追加で：
+`setup.sql` には通知用テーブルも含まれます。
+
+**既存環境へ通知だけ追加する場合:**
 
 ```
 supabase/RUN_PUSH_NOTIFICATIONS.sql
 ```
+
+`supabase/RUN_THIS_IN_SUPABASE.sql` は `setup.sql` への案内用ポインタです。
 
 ### 4. 起動
 
@@ -81,6 +93,8 @@ npm run dev
 - 納品チェックリスト
 - 障害・バックアップ対応手順
 - サービス利用申込書ひな形
+- 問い合わせ先案内
+- 通知・VAPID設定手順
 - 納品資料一覧
 
 ## ライセンス

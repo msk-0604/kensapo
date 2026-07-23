@@ -50,7 +50,9 @@ export function PasskeySettings() {
     try {
       const { error: registerError } = await supabase.auth.registerPasskey();
       if (registerError) throw registerError;
-      setSuccess("顔認証・指紋ログインを登録しました。次回からワンタップでログインできます。");
+      setSuccess(
+        "この端末の顔認証・指紋を登録しました。通常はメールとパスワードでログインできます。"
+      );
       await loadPasskeys();
     } catch (err) {
       setError(getPasskeyErrorMessage(err));
@@ -95,7 +97,7 @@ export function PasskeySettings() {
         顔認証・指紋ログイン
       </h2>
       <p className="mb-5 text-base leading-relaxed text-gray-600">
-        Face IDや指紋認証で、次回からパスワードなしでログインできます。
+        Face IDや指紋認証をこの端末に登録できます。ログインはメールアドレスとパスワードが基本です。
       </p>
 
       <Button

@@ -121,16 +121,6 @@ export interface DailyReportInput {
   next_plan: string;
 }
 
-export interface GeneratedReport {
-  subject: string;
-  todayWork: string;
-  progress: string;
-  confirmations: string;
-  nextSchedule: string;
-  messageToClient: string;
-  formattedText: string;
-}
-
 export interface PushSubscriptionRow {
   id: string;
   user_id: string;
