@@ -10,12 +10,14 @@ export async function notifyCompanyUpdate(
   payload: NotifyPayload
 ): Promise<void> {
   try {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), 8000);
     await fetch("/api/push/notify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
-      keepalive: true,
-    });
+      signal: controller.signal,
+    }).finally(() => window.clearTimeout(timer));
   } catch {
     // 通知失敗は主操作を止めない
   }

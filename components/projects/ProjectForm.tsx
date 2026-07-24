@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { PROJECT_STATUS_LABELS } from "@/lib/constants";
 import { LIMITS } from "@/lib/security/validation";
-import { createClient } from "@/lib/supabase/client";
-import { seedProgressItemsClient } from "@/components/progress/SeedProgressButton";
 import { notifyCompanyUpdate } from "@/lib/push/client";
 
 type Props = {
@@ -26,7 +24,7 @@ const defaultForm = {
   memo: "",
 };
 
-export function ProjectForm({ project, companyId }: Props) {
+export function ProjectForm({ project }: Props) {
   const router = useRouter();
   const [form, setForm] = useState(
     project
@@ -52,49 +50,45 @@ export function ProjectForm({ project, companyId }: Props) {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const supabase = createClient();
-    const payload = {
-      name: form.name,
-      address: form.address || null,
-      manager_name: form.manager_name || null,
-      start_date: form.start_date || null,
-      end_date: form.end_date || null,
-      status: form.status,
-      memo: form.memo || null,
-    };
 
     try {
-      if (project) {
-        const { error: updateError } = await supabase
-          .from("projects")
-          .update(payload)
-          .eq("id", project.id);
-        if (updateError) throw updateError;
-        void notifyCompanyUpdate({
-          title: "現場情報を更新しました",
-          body: `${form.name} の内容が変更されました`,
-          url: `/sites/${project.id}`,
-          tag: `site-${project.id}`,
-        });
-        router.replace(`/sites/${project.id}`);
-      } else {
-        const { data, error: insertError } = await supabase
-          .from("projects")
-          .insert({ ...payload, company_id: companyId })
-          .select()
-          .single();
-        if (insertError) throw insertError;
-        void notifyCompanyUpdate({
-          title: "新しい現場が登録されました",
-          body: form.name,
-          url: `/sites/${data.id}`,
-          tag: `site-${data.id}`,
-        });
-        router.replace(`/sites/${data.id}`);
-        void seedProgressItemsClient(data.id, companyId).catch(() => {});
+      const controller = new AbortController();
+      const timer = window.setTimeout(() => controller.abort(), 20000);
+
+      const res = await fetch("/api/projects", {
+        method: project ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify(
+          project
+            ? { id: project.id, ...form }
+            : form
+        ),
+      }).finally(() => window.clearTimeout(timer));
+
+      const data = (await res.json().catch(() => null)) as
+        | { ok?: boolean; id?: string; name?: string; error?: string }
+        | null;
+
+      if (!res.ok || !data?.id) {
+        throw new Error(data?.error || "保存に失敗しました。もう一度お試しください。");
       }
+
+      void notifyCompanyUpdate({
+        title: project ? "現場情報を更新しました" : "新しい現場が登録されました",
+        body: project ? `${form.name} の内容が変更されました` : form.name,
+        url: `/sites/${data.id}`,
+        tag: `site-${data.id}`,
+      });
+
+      router.replace(`/sites/${data.id}`);
+      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "\u4fdd\u5b58\u306b\u5931\u6557\u3057\u307e\u3057\u305f");
+      if (err instanceof DOMException && err.name === "AbortError") {
+        setError("保存がタイムアウトしました。通信状況を確認して、もう一度お試しください。");
+      } else {
+        setError(err instanceof Error ? err.message : "保存に失敗しました");
+      }
     } finally {
       setLoading(false);
     }
