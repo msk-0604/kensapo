@@ -1,0 +1,474 @@
+{
+  "categories": [
+    {
+      "id": "getting-started",
+      "title": "初めて使う方",
+      "description": "ログインから最初の一日まで",
+      "icon": "Hand",
+      "order": 1
+    },
+    {
+      "id": "dashboard",
+      "title": "ダッシュボード",
+      "description": "ホーム画面の使い方",
+      "icon": "LayoutDashboard",
+      "order": 2
+    },
+    {
+      "id": "sites",
+      "title": "現場管理",
+      "description": "現場の登録・確認・進行",
+      "icon": "MapPin",
+      "order": 3
+    },
+    {
+      "id": "workers",
+      "title": "作業員管理",
+      "description": "作業員の登録と一覧",
+      "icon": "Users",
+      "order": 4
+    },
+    {
+      "id": "schedule",
+      "title": "スケジュール",
+      "description": "予定の登録・開始・終了",
+      "icon": "Calendar",
+      "order": 5
+    },
+    {
+      "id": "reports",
+      "title": "日報",
+      "description": "日報の作成と確認",
+      "icon": "FileText",
+      "order": 6
+    },
+    {
+      "id": "photos",
+      "title": "写真管理",
+      "description": "現場写真の撮影と保存",
+      "icon": "Camera",
+      "order": 7
+    },
+    {
+      "id": "progress",
+      "title": "工事進行",
+      "description": "チェックリストで進捗管理",
+      "icon": "ListChecks",
+      "order": 8
+    },
+    {
+      "id": "notifications",
+      "title": "通知",
+      "description": "ロック画面へのお知らせ",
+      "icon": "Bell",
+      "order": 9
+    },
+    {
+      "id": "profile",
+      "title": "プロフィール",
+      "description": "アカウントと顔認証",
+      "icon": "User",
+      "order": 10
+    },
+    {
+      "id": "admin",
+      "title": "管理者設定",
+      "description": "会社設定と導入時の準備",
+      "icon": "Settings",
+      "order": 11
+    },
+    {
+      "id": "faq",
+      "title": "よくある質問",
+      "description": "困ったときの答え",
+      "icon": "CircleHelp",
+      "order": 12,
+      "href": "/help/faq"
+    },
+    {
+      "id": "videos",
+      "title": "動画マニュアル",
+      "description": "動画で操作を確認",
+      "icon": "PlayCircle",
+      "order": 13,
+      "href": "/help/videos"
+    }
+  ],
+  "articles": [
+    {
+      "id": "getting-started",
+      "title": "初めて使う方",
+      "category": "基本操作",
+      "summary": "KenSapoを初めて使う方向けのスタートガイドです。",
+      "content": "KenSapoは、建設現場の予定・作業員・写真・日報・工事進行をスマートフォンで管理するシステムです。まずはログインし、ホーム画面追加と通知設定を行うとスムーズに使い始められます。",
+      "steps": [
+        {
+          "title": "ログインする",
+          "body": "本番URLを開き、メールアドレスとパスワードでログインします。初めての管理者は「新規登録」から会社情報を登録します。"
+        },
+        {
+          "title": "ホーム画面に追加する",
+          "body": "iPhoneはSafariの共有から「ホーム画面に追加」。AndroidはChromeのメニューから追加します。"
+        },
+        {
+          "title": "通知をオンにする",
+          "body": "「設定」→「通知をオンにする」→端末で「許可」を選びます。"
+        },
+        {
+          "title": "現場と予定を確認する",
+          "body": "下メニューの「現場」「予定」から、今日の仕事を確認します。"
+        }
+      ],
+      "images": [
+        "/help/getting-started-login.png",
+        "/help/getting-started-home.png",
+        "/help/getting-started-notify.png",
+        "/help/getting-started-schedule.png"
+      ],
+      "example": "例：朝イチでKenSapoを開き、今日の予定を確認してから現場へ向かう。",
+      "notes": [
+        "パスワードはお客様自身で管理してください。",
+        "オフラインでは使えません。電波のよい場所で操作してください。"
+      ],
+      "related": ["dashboard", "notifications", "schedule"]
+    },
+    {
+      "id": "dashboard",
+      "title": "ダッシュボード（ホーム）",
+      "category": "基本操作",
+      "summary": "今日使う操作をまとめたホーム画面です。",
+      "content": "下メニューの「ホーム」がダッシュボードです。今日の予定や、よく使う操作（写真・日報など）へ素早く移動できます。",
+      "steps": [
+        {
+          "title": "「ホーム」を開く",
+          "body": "画面下の「ホーム」を押します。"
+        },
+        {
+          "title": "今日の予定を確認する",
+          "body": "表示されている予定から、作業開始・終了ができます。"
+        },
+        {
+          "title": "よく使う操作を選ぶ",
+          "body": "「写真を撮る」など、大きなボタンから次の作業へ進みます。"
+        }
+      ],
+      "images": [
+        "/help/dashboard.png",
+        "/help/dashboard-today.png",
+        "/help/dashboard-actions.png"
+      ],
+      "example": "例：ホームで自分の予定を確認し、「作業を開始する」を押して現場作業を始める。",
+      "notes": [
+        "下メニューは「ホーム・予定・現場・設定」の4つです。"
+      ],
+      "related": ["schedule", "photos", "reports"]
+    },
+    {
+      "id": "sites",
+      "title": "現場管理",
+      "category": "現場",
+      "summary": "現場の登録・詳細・写真・日報・工事進行を管理します。",
+      "content": "「現場」メニューから、工事現場の情報を登録・確認します。各現場の詳細画面から写真・日報・工事進行へ進めます。",
+      "steps": [
+        {
+          "title": "「現場一覧」を開く",
+          "body": "下メニューの「現場」を押します。"
+        },
+        {
+          "title": "「新しい現場を登録する」を押す",
+          "body": "一覧画面の大きなボタンから登録画面へ進みます。"
+        },
+        {
+          "title": "必要事項を入力する",
+          "body": "現場名・住所・担当者・着工日・完了予定日・状態・メモを入力します。"
+        },
+        {
+          "title": "保存する",
+          "body": "「この現場を登録する」を押して保存します。"
+        }
+      ],
+      "images": [
+        "/help/project-list.png",
+        "/help/project-new.png",
+        "/help/project-form.png",
+        "/help/project-saved.png"
+      ],
+      "example": "例：風呂取り換え工事の現場を登録し、担当者と工期を入れて保存する。",
+      "notes": [
+        "状態は「予定・進行中・完了」から選びます。",
+        "現場を開くと写真・日報・工事進行へ移動できます。"
+      ],
+      "related": ["photos", "reports", "progress"]
+    },
+    {
+      "id": "workers",
+      "title": "作業員管理",
+      "category": "管理",
+      "summary": "作業員の名前・電話・職種を登録します。",
+      "content": "予定に割り当てる作業員は、設定画面から登録します。",
+      "steps": [
+        {
+          "title": "「設定」を開く",
+          "body": "下メニューの「設定」を押します。"
+        },
+        {
+          "title": "「作業員を管理する」を押す",
+          "body": "作業員一覧へ移動します。"
+        },
+        {
+          "title": "作業員を登録する",
+          "body": "名前・電話番号・職種を入力して保存します。"
+        }
+      ],
+      "images": [
+        "/help/worker-settings.png",
+        "/help/worker-list.png",
+        "/help/worker-add.png"
+      ],
+      "example": "例：職種「設備」の作業員を登録し、翌日の予定に割り当てる。",
+      "notes": [
+        "在籍していない作業員は状態を変更して管理できます。"
+      ],
+      "related": ["schedule", "admin"]
+    },
+    {
+      "id": "schedule",
+      "title": "スケジュール（予定）",
+      "category": "予定",
+      "summary": "作業予定の登録と、開始・終了の記録です。",
+      "content": "「予定」で日付ごとの作業を管理します。当日は「作業を開始する」「作業を終了する」で実績を残せます。",
+      "steps": [
+        {
+          "title": "「予定」を開く",
+          "body": "下メニューの「予定」を押します。"
+        },
+        {
+          "title": "「新しい予定を追加する」を押す",
+          "body": "予定登録画面を開きます。"
+        },
+        {
+          "title": "内容を入力して保存する",
+          "body": "日付・現場・作業員・時間・作業内容を入力します。"
+        },
+        {
+          "title": "開始・終了を記録する",
+          "body": "当日の予定で「作業を開始する」「作業を終了する」を押します。"
+        }
+      ],
+      "images": [
+        "/help/schedule-list.png",
+        "/help/schedule-new.png",
+        "/help/schedule-form.png",
+        "/help/schedule-start.png"
+      ],
+      "example": "例：明日の現場Aに作業員Bを割り当て、朝8時開始の予定を入れる。",
+      "notes": [
+        "開始・終了すると、同じ会社の他ユーザーへ通知が届くことがあります。"
+      ],
+      "related": ["sites", "workers", "notifications"]
+    },
+    {
+      "id": "reports",
+      "title": "日報",
+      "category": "現場",
+      "summary": "現場ごとの日報を手入力で記録します。",
+      "content": "日報は現場詳細から作成します。日付・天気・人数・作業内容などを入力して保存します。AIによる自動生成はありません。",
+      "steps": [
+        {
+          "title": "現場を開く",
+          "body": "「現場」から対象現場を選びます。"
+        },
+        {
+          "title": "「日報」を開く",
+          "body": "現場詳細の日報へ進みます。"
+        },
+        {
+          "title": "「新しい日報を書く」を押す",
+          "body": "入力画面を開きます。"
+        },
+        {
+          "title": "内容を入力して保存する",
+          "body": "日付・天気・人数・作業内容・材料・問題点・翌日予定などを入力し、「日報を保存する」を押します。"
+        }
+      ],
+      "images": [
+        "/help/report-site.png",
+        "/help/report-list.png",
+        "/help/report-create.png",
+        "/help/report-saved.png"
+      ],
+      "example": "例：本日の作業内容と人数を入力し、問題点に「部材不足」と書いて保存する。",
+      "notes": [
+        "KenSapoにAI報告書機能はありません。日報は手入力です。"
+      ],
+      "related": ["sites", "photos"]
+    },
+    {
+      "id": "photos",
+      "title": "写真管理",
+      "category": "現場",
+      "summary": "現場写真の撮影・保存・確認です。",
+      "content": "ホームの「写真を撮る」または現場詳細の写真画面から、写真を保存できます。",
+      "steps": [
+        {
+          "title": "写真画面を開く",
+          "body": "ホームの「写真を撮る」、または現場詳細から「写真」を開きます。"
+        },
+        {
+          "title": "現場を選ぶ",
+          "body": "どの現場の写真かを選びます。"
+        },
+        {
+          "title": "撮影日・タイトル・メモを入れる",
+          "body": "あとで探しやすいように短いタイトルを付けます。"
+        },
+        {
+          "title": "写真を撮影または選択して保存する",
+          "body": "カメラまたはアルバムから選んで保存します。"
+        }
+      ],
+      "images": [
+        "/help/photo-entry.png",
+        "/help/photo-select-site.png",
+        "/help/photo-form.png",
+        "/help/photo-saved.png"
+      ],
+      "example": "例：工事前写真を「施工前」タイトルで保存する。",
+      "notes": [
+        "写真が大きいとアップロードに失敗することがあります。電波のよい場所で再試行してください。"
+      ],
+      "related": ["sites", "reports"]
+    },
+    {
+      "id": "progress",
+      "title": "工事進行",
+      "category": "現場",
+      "summary": "チェックリストで工事の進み具合を管理します。",
+      "content": "現場ごとに標準のチェック項目があり、完了した項目をタップして進捗を更新します。",
+      "steps": [
+        {
+          "title": "現場を開く",
+          "body": "「現場」から対象現場を選びます。"
+        },
+        {
+          "title": "「工事進行」を開く",
+          "body": "現場詳細から工事進行画面へ進みます。"
+        },
+        {
+          "title": "完了した項目をチェックする",
+          "body": "終わった項目を押して完了にします。"
+        }
+      ],
+      "images": [
+        "/help/progress-site.png",
+        "/help/progress-list.png",
+        "/help/progress-check.png"
+      ],
+      "example": "例：給水配管が終わったら「給水」にチェックを入れる。",
+      "notes": [
+        "進捗率は現場画面でも確認できます。"
+      ],
+      "related": ["sites"]
+    },
+    {
+      "id": "notifications",
+      "title": "通知",
+      "category": "設定",
+      "summary": "同じ会社の更新をロック画面で受け取ります。",
+      "content": "通知をオンにすると、予定・現場・日報・写真・工事進行などの更新が、同じ会社の他ユーザーへ届きます。自分の操作は自分には送られません。",
+      "steps": [
+        {
+          "title": "「設定」を開く",
+          "body": "下メニューの「設定」を押します。"
+        },
+        {
+          "title": "「通知をオンにする」を押す",
+          "body": "KenSapoの通知設定を開始します。"
+        },
+        {
+          "title": "端末で「許可」を選ぶ",
+          "body": "表示された確認で許可します。"
+        }
+      ],
+      "images": [
+        "/help/notify-settings.png",
+        "/help/notify-on.png",
+        "/help/notify-permission.png"
+      ],
+      "example": "例：別の担当者が予定を追加すると、ロック中のスマホに通知が届く。",
+      "notes": [
+        "iPhoneはホーム画面に追加したKenSapoから通知をオンにしてください。",
+        "通知は設定をオンにした端末にだけ届きます。"
+      ],
+      "related": ["getting-started", "schedule"]
+    },
+    {
+      "id": "profile",
+      "title": "プロフィール",
+      "category": "設定",
+      "summary": "名前・メール・顔認証の確認です。",
+      "content": "設定画面でプロフィールと会社情報を確認できます。対応端末では顔認証・指紋の登録もできます。ログインの基本はメールとパスワードです。",
+      "steps": [
+        {
+          "title": "「設定」を開く",
+          "body": "下メニューの「設定」を押します。"
+        },
+        {
+          "title": "プロフィールを確認する",
+          "body": "お名前・メール・権限を確認します。"
+        },
+        {
+          "title": "必要なら顔認証を登録する",
+          "body": "「顔認証・指紋の設定」から端末の認証を登録します。"
+        }
+      ],
+      "images": [
+        "/help/profile-settings.png",
+        "/help/profile-card.png",
+        "/help/profile-passkey.png"
+      ],
+      "example": "例：自分のメールアドレスが正しいか設定画面で確認する。",
+      "notes": [
+        "ログアウトは設定画面の最下部です。"
+      ],
+      "related": ["admin", "notifications"]
+    },
+    {
+      "id": "admin",
+      "title": "管理者設定",
+      "category": "管理",
+      "summary": "会社の初期設定と運用のポイントです。",
+      "content": "管理者は会社登録後、現場・作業員・予定を整え、各端末でホーム画面追加と通知設定を案内します。",
+      "steps": [
+        {
+          "title": "会社と管理者を登録する",
+          "body": "新規登録から会社名・管理者名・メール・パスワードを登録します。"
+        },
+        {
+          "title": "現場と作業員を用意する",
+          "body": "最初の現場と作業員を登録します。"
+        },
+        {
+          "title": "予定を入れる",
+          "body": "翌営業日または当日の予定を登録します。"
+        },
+        {
+          "title": "端末セットアップを案内する",
+          "body": "ホーム画面追加と通知オンを全員に案内します。"
+        }
+      ],
+      "images": [
+        "/help/admin-register.png",
+        "/help/admin-site.png",
+        "/help/admin-worker.png",
+        "/help/admin-devices.png"
+      ],
+      "example": "例：導入日に管理者アカウントで現場1件と作業員を登録し、全員の通知を確認する。",
+      "notes": [
+        "厳密なロール別の画面制限は今後の拡張対象です。",
+        "問い合わせ先は導入時の案内を確認してください。"
+      ],
+      "related": ["getting-started", "workers", "sites"]
+    }
+  ]
+}

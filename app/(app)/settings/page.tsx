@@ -35,6 +35,9 @@ export default async function SettingsPage() {
       />
 
       <section className="mb-8 space-y-4">
+        <ActionLink href="/help" description="操作方法・FAQ・動画マニュアル">
+          📖 取扱説明書
+        </ActionLink>
         <ActionLink href="/workers" description="作業員の登録・一覧">
           作業員を管理する
         </ActionLink>

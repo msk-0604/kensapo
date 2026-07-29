@@ -1,0 +1,16 @@
+{
+  "videos": [
+    {
+      "id": "intro",
+      "title": "KenSapoの基本操作（サンプル）",
+      "description": "ログインから予定確認までの流れを短く紹介します。管理者は下のYouTube URLを差し替えてください。",
+      "youtubeUrl": ""
+    },
+    {
+      "id": "notify",
+      "title": "通知のオン方法（サンプル）",
+      "description": "設定画面から通知を許可する手順です。URL未設定のときは準備中と表示されます。",
+      "youtubeUrl": ""
+    }
+  ]
+}

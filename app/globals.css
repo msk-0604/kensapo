@@ -48,9 +48,22 @@ body {
 @media print {
   body {
     background: white;
-    font-size: 14px;
+    font-size: 12pt;
+    color: #000;
   }
   .no-print {
     display: none !important;
+  }
+  .help-print-area {
+    max-width: 210mm;
+    margin: 0 auto;
+  }
+  .help-print-area a {
+    color: #000;
+    text-decoration: none;
+  }
+  @page {
+    size: A4;
+    margin: 16mm;
   }
 }
