@@ -54,6 +54,12 @@ export default async function WorkersPage() {
                 <p className="mt-2 text-base font-bold text-navy-800">
                   {WORKER_STATUS_LABELS[worker.status]}
                 </p>
+                <Link
+                  href={`/workers/${worker.id}/edit`}
+                  className="mt-4 flex min-h-[3.5rem] items-center justify-center rounded-2xl border-2 border-gray-300 bg-white text-lg font-bold text-navy-900 hover:bg-gray-50"
+                >
+                  この作業員を変更する
+                </Link>
               </Card>
             </li>
           ))}

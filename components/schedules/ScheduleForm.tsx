@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { todayISO } from "@/lib/utils";
 import { notifyCompanyUpdate } from "@/lib/push/client";
+import { toSaveUserMessage, withTimeout } from "@/lib/ui/user-errors";
 import type { Project, Worker } from "@/types/database";
 import type { ScheduleWithDetails } from "@/lib/schedules";
 
@@ -45,51 +46,54 @@ export function ScheduleForm({
     e.preventDefault();
     setLoading(true);
     setError("");
-    const supabase = createClient();
 
-    const payload = {
-      project_id: form.project_id,
-      worker_id: form.worker_id || null,
-      schedule_date: form.schedule_date,
-      client_company_name: form.client_company_name.trim() || null,
-      location: form.location.trim() || null,
-      title: form.title.trim() || null,
-      work_content: form.work_content.trim() || null,
-      scheduled_start_time: form.scheduled_start_time || null,
-      scheduled_end_time: form.scheduled_end_time || null,
-      memo: form.memo.trim() || null,
-      updated_at: new Date().toISOString(),
-    };
+    try {
+      const supabase = createClient();
+      const payload = {
+        project_id: form.project_id,
+        worker_id: form.worker_id || null,
+        schedule_date: form.schedule_date,
+        client_company_name: form.client_company_name.trim() || null,
+        location: form.location.trim() || null,
+        title: form.title.trim() || null,
+        work_content: form.work_content.trim() || null,
+        scheduled_start_time: form.scheduled_start_time || null,
+        scheduled_end_time: form.scheduled_end_time || null,
+        memo: form.memo.trim() || null,
+        updated_at: new Date().toISOString(),
+      };
 
-    const { error: saveError } = schedule
-      ? await supabase
-          .from("schedules")
-          .update(payload)
-          .eq("id", schedule.id)
-      : await supabase.from("schedules").insert({
-          ...payload,
-          company_id: companyId,
-          status: "scheduled",
-        });
+      const { error: saveError } = await withTimeout(
+        schedule
+          ? supabase.from("schedules").update(payload).eq("id", schedule.id)
+          : supabase.from("schedules").insert({
+              ...payload,
+              company_id: companyId,
+              status: "scheduled",
+            }),
+        20000,
+        "保存がタイムアウトしました。通信状況を確認して、もう一度お試しください。"
+      );
 
-    setLoading(false);
-    if (saveError) {
-      setError(saveError.message);
-      return;
+      if (saveError) throw saveError;
+
+      if (onCancel) onCancel();
+      const projectName =
+        projects.find((p) => p.id === form.project_id)?.name || "現場";
+      void notifyCompanyUpdate({
+        title: schedule ? "予定を変更しました" : "新しい予定が入りました",
+        body: `${form.schedule_date} / ${projectName}${
+          form.title.trim() ? `：${form.title.trim()}` : ""
+        }`,
+        url: `/schedule?date=${form.schedule_date}`,
+        tag: `schedule-${schedule?.id ?? "new"}`,
+      });
+      router.replace(`/schedule?date=${form.schedule_date}`);
+    } catch (err) {
+      setError(toSaveUserMessage(err, "予定の保存に失敗しました"));
+    } finally {
+      setLoading(false);
     }
-
-    if (onCancel) onCancel();
-    const projectName =
-      projects.find((p) => p.id === form.project_id)?.name || "現場";
-    void notifyCompanyUpdate({
-      title: schedule ? "予定を変更しました" : "新しい予定が入りました",
-      body: `${form.schedule_date} / ${projectName}${
-        form.title.trim() ? `：${form.title.trim()}` : ""
-      }`,
-      url: `/schedule?date=${form.schedule_date}`,
-      tag: `schedule-${schedule?.id ?? "new"}`,
-    });
-    router.replace(`/schedule?date=${form.schedule_date}`);
   }
 
   if (projects.length === 0) {

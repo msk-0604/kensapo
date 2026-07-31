@@ -145,7 +145,7 @@ export function ProjectForm({ project }: Props) {
         rows={4}
       />
       {error ? (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-lg text-red-700">
           {error}
         </p>
       ) : null}

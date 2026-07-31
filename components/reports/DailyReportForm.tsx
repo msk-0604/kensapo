@@ -7,6 +7,7 @@ import { WEATHER_OPTIONS } from "@/lib/constants";
 import { LIMITS } from "@/lib/security/validation";
 import { todayISO } from "@/lib/utils";
 import { notifyCompanyUpdate } from "@/lib/push/client";
+import { toSaveUserMessage, withTimeout } from "@/lib/ui/user-errors";
 import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { HintBox } from "@/components/ui/HintBox";
@@ -36,36 +37,48 @@ export function DailyReportForm({
     setLoading(true);
     setError("");
 
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const { data, error: insertError } = await supabase
-      .from("daily_reports")
-      .insert({
-        project_id: projectId,
-        ...form,
-        workers_count: Number(form.workers_count),
-        created_by: user?.id ?? null,
-        status: "submitted",
-      })
-      .select()
-      .single();
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await withTimeout(
+        supabase.auth.getUser(),
+        15000,
+        "ログイン確認がタイムアウトしました。"
+      );
 
-    setLoading(false);
-    if (insertError) {
-      setError(insertError.message);
-      return;
+      const { data, error: insertError } = await withTimeout(
+        supabase
+          .from("daily_reports")
+          .insert({
+            project_id: projectId,
+            ...form,
+            workers_count: Number(form.workers_count),
+            created_by: user?.id ?? null,
+            status: "submitted",
+          })
+          .select()
+          .single(),
+        20000,
+        "保存がタイムアウトしました。通信状況を確認して、もう一度お試しください。"
+      );
+
+      if (insertError) throw insertError;
+      if (!data) throw new Error("日報の保存に失敗しました");
+
+      void notifyCompanyUpdate({
+        title: "日報が提出されました",
+        body: `${projectName}（${form.report_date}）`,
+        url: `/sites/${projectId}/reports`,
+        tag: `report-${data.id}`,
+      });
+
+      router.replace(`/sites/${projectId}/reports`);
+    } catch (err) {
+      setError(toSaveUserMessage(err, "日報の保存に失敗しました"));
+    } finally {
+      setLoading(false);
     }
-
-    void notifyCompanyUpdate({
-      title: "日報が提出されました",
-      body: `${projectName}（${form.report_date}）`,
-      url: `/sites/${projectId}/reports`,
-      tag: `report-${data.id}`,
-    });
-
-    router.replace(`/sites/${projectId}/reports`);
   }
 
   return (

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { TRADE_OPTIONS, WORKER_STATUS_LABELS } from "@/lib/constants";
+import { toSaveUserMessage, withTimeout } from "@/lib/ui/user-errors";
 import { Button } from "@/components/ui/Button";
 import { Input, Select } from "@/components/ui/Input";
 import type { Worker, WorkerStatus } from "@/types/database";
@@ -39,20 +40,23 @@ export function WorkerForm({
 
     try {
       if (worker) {
-        const { error: updateError } = await supabase
-          .from("workers")
-          .update(payload)
-          .eq("id", worker.id);
+        const { error: updateError } = await withTimeout(
+          supabase.from("workers").update(payload).eq("id", worker.id),
+          20000,
+          "保存がタイムアウトしました。通信状況を確認して、もう一度お試しください。"
+        );
         if (updateError) throw updateError;
       } else {
-        const { error: insertError } = await supabase
-          .from("workers")
-          .insert({ ...payload, company_id: companyId });
+        const { error: insertError } = await withTimeout(
+          supabase.from("workers").insert({ ...payload, company_id: companyId }),
+          20000,
+          "保存がタイムアウトしました。通信状況を確認して、もう一度お試しください。"
+        );
         if (insertError) throw insertError;
       }
       router.replace("/workers");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "保存に失敗しました");
+      setError(toSaveUserMessage(err, "作業員の保存に失敗しました"));
     } finally {
       setLoading(false);
     }

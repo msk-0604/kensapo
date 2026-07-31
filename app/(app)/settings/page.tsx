@@ -10,8 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "管理者",
-  manager: "現場監督",
-  worker: "作業員",
+  member: "メンバー",
 };
 
 export default async function SettingsPage() {

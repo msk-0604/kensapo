@@ -11,6 +11,7 @@ import {
   isValidEmail,
   LIMITS,
 } from "@/lib/security/validation";
+import { toAuthUserMessage, withTimeout } from "@/lib/ui/user-errors";
 
 type Mode = "login" | "signup";
 
@@ -18,19 +19,6 @@ type LoginFormProps = {
   supabaseUrl: string;
   supabaseAnonKey: string;
 };
-
-function withTimeout<T>(
-  promise: PromiseLike<T>,
-  ms: number,
-  message: string
-): Promise<T> {
-  return Promise.race([
-    Promise.resolve(promise),
-    new Promise<T>((_, reject) => {
-      setTimeout(() => reject(new Error(message)), ms);
-    }),
-  ]);
-}
 
 export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
   const router = useRouter();
@@ -117,13 +105,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
 
       router.replace("/dashboard");
     } catch (err) {
-      let message =
-        err instanceof Error ? err.message : "エラーが発生しました";
-      if (message.includes("User already registered")) {
-        message =
-          "このメールアドレスはすでに登録済みです。ログインタブからログインしてください。";
-      }
-      setError(message);
+      setError(toAuthUserMessage(err));
     } finally {
       setLoading(false);
     }
