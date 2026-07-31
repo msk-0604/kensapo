@@ -2,12 +2,17 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { ScheduleForm } from "@/components/schedules/ScheduleForm";
 import { ScheduleCard } from "@/components/schedules/ScheduleCard";
+import { WorkerNameList } from "@/components/ui/WorkerNameList";
 import { notifyCompanyUpdate } from "@/lib/push/client";
+import {
+  groupSchedulesByProject,
+  type ScheduleWithDetails,
+} from "@/lib/schedules-group";
 import type { Project, Worker } from "@/types/database";
-import type { ScheduleWithDetails } from "@/lib/schedules";
 
 export function ScheduleDayList({
   schedules,
@@ -25,6 +30,7 @@ export function ScheduleDayList({
   const router = useRouter();
   const [editing, setEditing] = useState<ScheduleWithDetails | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const grouped = groupSchedulesByProject(schedules);
 
   async function handleDelete(id: string) {
     if (!window.confirm("この予定を削除しますか？")) return;
@@ -64,25 +70,91 @@ export function ScheduleDayList({
 
   return (
     <section className="mb-8">
-      {schedules.length > 0 ? (
-        <ul className="mb-8 space-y-4">
-          {schedules.map((s) => (
-            <li key={s.id}>
-              <ScheduleCard
-                schedule={s}
-                onEdit={() => setEditing(s)}
-                onDelete={() => handleDelete(s.id)}
-                deleting={deletingId === s.id}
-              />
-            </li>
+      {grouped.length > 0 ? (
+        <div className="mb-8 space-y-8">
+          {grouped.map((group) => (
+            <section key={group.projectId}>
+              <div className="mb-4 rounded-2xl border-2 border-navy-900 bg-navy-900 px-5 py-4 text-white">
+                <p className="text-base font-bold text-white/80">現場</p>
+                <h2 className="mt-1 text-2xl font-bold leading-snug">
+                  {group.projectName}
+                </h2>
+                <div className="mt-3">
+                  <p className="mb-2 text-base font-bold text-white/80">
+                    今日の作業員（{group.workerNames.length}人）
+                  </p>
+                  {group.workerNames.length > 0 ? (
+                    <ul className="flex flex-wrap gap-2">
+                      {group.workerNames.map((name) => (
+                        <li
+                          key={name}
+                          className="rounded-xl bg-white px-3 py-2 text-lg font-bold text-navy-950"
+                        >
+                          {name}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-base font-bold text-white/70">
+                      作業員は未割当です
+                    </p>
+                  )}
+                </div>
+                <Link
+                  href={`/sites/${group.projectId}`}
+                  className="mt-4 inline-block text-base font-bold text-white underline"
+                >
+                  この現場の詳細を見る →
+                </Link>
+              </div>
+
+              <ul className="space-y-4">
+                {group.items.map((s) => (
+                  <li key={s.id}>
+                    <ScheduleCard
+                      schedule={s}
+                      hideProjectName
+                      onEdit={() => setEditing(s)}
+                      onDelete={() => handleDelete(s.id)}
+                      deleting={deletingId === s.id}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
+      ) : null}
+
+      {schedules.length === 0 && workers.length === 0 ? (
+        <div className="mb-6 rounded-2xl border-2 border-amber-200 bg-amber-50 px-5 py-4">
+          <p className="text-lg font-bold text-amber-950">
+            作業員がまだ登録されていません
+          </p>
+          <p className="mt-2 text-base text-amber-900">
+            予定に名前を付けるには、先に作業員を登録してください。
+          </p>
+          <Link
+            href="/workers/new"
+            className="mt-3 inline-block text-lg font-bold text-navy-900 underline"
+          >
+            作業員を登録する →
+          </Link>
+        </div>
       ) : null}
 
       <section>
         <h2 className="mb-4 text-lg font-bold text-gray-800">
           新しい予定を追加する
         </h2>
+        {workers.length > 0 ? (
+          <div className="mb-4 rounded-2xl border-2 border-gray-200 bg-white px-4 py-3">
+            <p className="mb-2 text-base font-bold text-gray-700">
+              登録済みの作業員
+            </p>
+            <WorkerNameList names={workers.map((w) => w.name)} />
+          </div>
+        ) : null}
         <ScheduleForm
           companyId={companyId}
           workers={workers}

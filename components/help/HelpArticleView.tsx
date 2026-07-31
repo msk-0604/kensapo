@@ -1,8 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import type { HelpArticle } from "@/lib/help/types";
+import type { HelpArticle, HelpMedia } from "@/lib/help/types";
 import { HelpImage } from "@/components/help/HelpImage";
 import { HelpPrintActions } from "@/components/help/HelpPrintActions";
+import { HelpFavoriteButton } from "@/components/help/HelpFavoriteButton";
+import { HelpLightbox } from "@/components/help/HelpLightbox";
 import { Card } from "@/components/ui/Card";
+import { getStepMedia } from "@/lib/help/media";
 
 export function HelpArticleView({
   article,
@@ -11,6 +17,8 @@ export function HelpArticleView({
   article: HelpArticle;
   related: HelpArticle[];
 }) {
+  const [lightbox, setLightbox] = useState<HelpMedia | null>(null);
+
   return (
     <article className="help-print-area space-y-8">
       <div className="no-print flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -21,7 +29,10 @@ export function HelpArticleView({
           </h1>
           <p className="mt-2 text-lg text-gray-600">{article.summary}</p>
         </div>
-        <HelpPrintActions title={article.title} />
+        <div className="flex w-full flex-col gap-3 sm:w-auto">
+          <HelpFavoriteButton articleId={article.id} title={article.title} />
+          <HelpPrintActions title={article.title} />
+        </div>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[14rem_1fr]">
@@ -79,15 +90,19 @@ export function HelpArticleView({
                   {i + 1} / {article.steps.length}
                 </p>
                 <h3 className="text-xl font-bold text-navy-950">
-                  {String.fromCodePoint(0x2460 + i)} {step.title}
+                  {i < 20
+                    ? `${String.fromCodePoint(0x2460 + i)} `
+                    : `${i + 1}. `}
+                  {step.title}
                 </h3>
                 <p className="mt-3 text-lg leading-relaxed text-gray-800">
                   {step.body}
                 </p>
                 <HelpImage
-                  src={article.images[i]}
+                  media={getStepMedia(article, step, i)}
                   alt={`${article.title} 手順${i + 1}の画面`}
                   caption={`手順 ${i + 1}`}
+                  onOpen={setLightbox}
                 />
                 {i < article.steps.length - 1 ? (
                   <p className="mt-2 text-center text-2xl font-bold text-navy-700">
@@ -137,6 +152,8 @@ export function HelpArticleView({
           ) : null}
         </div>
       </div>
+
+      <HelpLightbox media={lightbox} onClose={() => setLightbox(null)} />
     </article>
   );
 }

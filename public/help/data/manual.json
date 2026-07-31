@@ -75,7 +75,8 @@
       "title": "管理者設定",
       "description": "会社設定と導入時の準備",
       "icon": "Settings",
-      "order": 11
+      "order": 11,
+      "roles": ["admin"]
     },
     {
       "id": "faq",
@@ -92,6 +93,22 @@
       "icon": "PlayCircle",
       "order": 13,
       "href": "/help/videos"
+    },
+    {
+      "id": "contact",
+      "title": "お問い合わせ",
+      "description": "サポート窓口の案内",
+      "icon": "Mail",
+      "order": 14,
+      "href": "/help/contact"
+    },
+    {
+      "id": "changelog",
+      "title": "更新履歴",
+      "description": "変更点の一覧",
+      "icon": "History",
+      "order": 15,
+      "href": "/help/changelog"
     }
   ],
   "articles": [
@@ -439,6 +456,8 @@
       "category": "管理",
       "summary": "会社の初期設定と運用のポイントです。",
       "content": "管理者は会社登録後、現場・作業員・予定を整え、各端末でホーム画面追加と通知設定を案内します。",
+      "roles": ["admin"],
+      "keywords": ["管理者", "導入", "会社登録", "admin"],
       "steps": [
         {
           "title": "会社と管理者を登録する",

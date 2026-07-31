@@ -1,11 +1,14 @@
 import { createClient } from "@/lib/supabase/server";
 import type { Schedule } from "@/types/database";
 import { todayISO } from "@/lib/utils";
+import type { ScheduleWithDetails } from "@/lib/schedules-types";
 
-export type ScheduleWithDetails = Schedule & {
-  worker_name: string | null;
-  project_name: string;
-};
+export type { ScheduleWithDetails } from "@/lib/schedules-types";
+export {
+  groupSchedulesByProject,
+  uniqueWorkerNames,
+  workerNamesByProject,
+} from "@/lib/schedules-group";
 
 function mapScheduleRow(
   row: Schedule & {

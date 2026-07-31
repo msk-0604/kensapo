@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/Button";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { todayISO } from "@/lib/utils";
 import { notifyCompanyUpdate } from "@/lib/push/client";
+import type { ScheduleWithDetails } from "@/lib/schedules-types";
 import { toSaveUserMessage, withTimeout } from "@/lib/ui/user-errors";
 import type { Project, Worker } from "@/types/database";
-import type { ScheduleWithDetails } from "@/lib/schedules";
 
 export function ScheduleForm({
   companyId,

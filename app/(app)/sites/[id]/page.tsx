@@ -9,11 +9,13 @@ import { SiteProgressBar } from "@/components/sites/SiteProgressBar";
 import { SeedProgressButton } from "@/components/progress/SeedProgressButton";
 import { getSite } from "@/lib/sites";
 import { getSchedulesForProject } from "@/lib/schedules";
+import { uniqueWorkerNames } from "@/lib/schedules-group";
 import { getProgressItems, getProgressSummary } from "@/lib/progress-checklist";
 import { getSiteProgressPercent } from "@/lib/progress";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { formatDate } from "@/lib/utils";
+import { formatDate, todayISO } from "@/lib/utils";
+import { WorkerNameList } from "@/components/ui/WorkerNameList";
 
 export default async function SiteDetailPage({
   params,
@@ -38,6 +40,10 @@ export default async function SiteDetailPage({
 
   const siteSchedules = await getSchedulesForProject(id);
   const progressPercent = getSiteProgressPercent(site);
+  const today = todayISO();
+  const todaySchedules = siteSchedules.filter((s) => s.schedule_date === today);
+  const todayWorkers = uniqueWorkerNames(todaySchedules);
+  const upcomingWorkers = uniqueWorkerNames(siteSchedules);
 
   let checklistSummary = null;
   try {
@@ -145,9 +151,35 @@ export default async function SiteDetailPage({
         </div>
       </Card>
 
+      <Card className="mb-8 !p-5">
+        <h2 className="mb-3 text-xl font-bold text-navy-950">この現場の人員</h2>
+        <div className="mb-5 rounded-2xl border-2 border-navy-200 bg-navy-900/5 px-4 py-4">
+          <p className="mb-2 text-base font-bold text-navy-700">今日の作業員</p>
+          <WorkerNameList
+            names={todayWorkers}
+            emptyLabel="今日の予定に作業員はいません"
+          />
+        </div>
+        {upcomingWorkers.length > 0 ? (
+          <div>
+            <p className="mb-2 text-base font-bold text-gray-700">
+              これから入る予定の作業員
+            </p>
+            <WorkerNameList names={upcomingWorkers} />
+          </div>
+        ) : null}
+        <div className="mt-5">
+          <Link href="/workers">
+            <Button variant="secondary" fullWidth size="md">
+              作業員の登録・一覧を見る
+            </Button>
+          </Link>
+        </div>
+      </Card>
+
       {siteSchedules.length > 0 ? (
         <Card className="mb-8 !p-5">
-          <h2 className="mb-4 text-lg font-bold text-gray-800">
+          <h2 className="mb-4 text-xl font-bold text-navy-950">
             この現場の予定
           </h2>
           <ul className="space-y-3">
@@ -156,8 +188,11 @@ export default async function SiteDetailPage({
                 key={s.id}
                 className="rounded-xl border-2 border-gray-100 bg-gray-50 px-4 py-3"
               >
-                <p className="text-base font-bold text-navy-950">
-                  {formatDate(s.schedule_date)} — {s.worker_name}
+                <p className="text-base font-bold text-navy-700">
+                  {formatDate(s.schedule_date)}
+                </p>
+                <p className="mt-1 text-xl font-bold text-navy-950">
+                  {s.worker_name || "作業員未割当"}
                 </p>
                 {s.work_content ? (
                   <p className="mt-1 text-base text-gray-600">
@@ -177,11 +212,11 @@ export default async function SiteDetailPage({
         </Card>
       ) : (
         <Card className="mb-8 !p-5">
-          <h2 className="mb-2 text-lg font-bold text-gray-800">
+          <h2 className="mb-2 text-xl font-bold text-navy-950">
             この現場の予定
           </h2>
           <p className="mb-4 text-base text-gray-600">
-            まだ予定が登録されていません。
+            まだ予定が登録されていません。作業員を割り当てて予定を入れると、ここに名前が表示されます。
           </p>
           <Link href="/schedule">
             <Button fullWidth size="md">

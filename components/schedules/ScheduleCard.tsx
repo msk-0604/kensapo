@@ -13,18 +13,20 @@ import {
   todayISO,
 } from "@/lib/utils";
 import { notifyCompanyUpdate } from "@/lib/push/client";
-import type { ScheduleWithDetails } from "@/lib/schedules";
+import type { ScheduleWithDetails } from "@/lib/schedules-types";
 
 export function ScheduleCard({
   schedule,
   onEdit,
   onDelete,
   deleting,
+  hideProjectName = false,
 }: {
   schedule: ScheduleWithDetails;
   onEdit: () => void;
   onDelete: () => void;
   deleting?: boolean;
+  hideProjectName?: boolean;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState<"start" | "end" | null>(null);
@@ -96,6 +98,19 @@ export function ScheduleCard({
 
   return (
     <Card className="!p-5">
+      {schedule.worker_name ? (
+        <div className="mb-4 rounded-2xl border-2 border-navy-200 bg-navy-900/5 px-4 py-3">
+          <p className="text-base font-bold text-navy-700">作業員</p>
+          <p className="mt-1 text-2xl font-bold text-navy-950">
+            {schedule.worker_name}
+          </p>
+        </div>
+      ) : (
+        <div className="mb-4 rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-3">
+          <p className="text-lg font-bold text-gray-500">作業員は未割当</p>
+        </div>
+      )}
+
       {timeRange ? (
         <p className="text-base font-bold text-navy-700">{timeRange}</p>
       ) : null}
@@ -111,7 +126,7 @@ export function ScheduleCard({
           場所：{schedule.location}
         </p>
       ) : null}
-      {schedule.project_name ? (
+      {!hideProjectName && schedule.project_name ? (
         <p className="mt-1 text-base text-gray-600">
           現場：{schedule.project_name}
         </p>
@@ -122,12 +137,6 @@ export function ScheduleCard({
           <p className="text-base font-bold text-gray-600">作業内容</p>
           <p className="mt-1 text-xl text-navy-950">{schedule.work_content}</p>
         </div>
-      ) : null}
-
-      {schedule.worker_name ? (
-        <p className="mt-3 text-base text-gray-600">
-          担当：{schedule.worker_name}
-        </p>
       ) : null}
 
       {schedule.actual_start_time || schedule.actual_end_time ? (

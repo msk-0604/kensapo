@@ -8,8 +8,10 @@ import {
   CircleHelp,
   FileText,
   Hand,
+  History,
   LayoutDashboard,
   ListChecks,
+  Mail,
   MapPin,
   PlayCircle,
   Settings,
@@ -34,6 +36,8 @@ const ICONS: Record<string, LucideIcon> = {
   Settings,
   CircleHelp,
   PlayCircle,
+  Mail,
+  History,
 };
 
 export function HelpCategoryCards({

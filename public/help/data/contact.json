@@ -1,0 +1,25 @@
+{
+  "serviceName": "KenSapo",
+  "productionUrl": "https://kensapo.vercel.app",
+  "companyName": "",
+  "contactPerson": "山本真樹",
+  "phone": "",
+  "email": "yamamoto0604@gmail.com",
+  "lineOrChat": "",
+  "hours": "平日 9:00〜17:00（祝日を除く）",
+  "tips": [
+    "会社名",
+    "お名前",
+    "使っている端末（iPhone / Android / PC）",
+    "どの画面か",
+    "何をしたか",
+    "表示された文言、またはスクリーンショット"
+  ],
+  "commonChecks": [
+    "ログインできない場合は、メールアドレスとパスワードを確認してください。",
+    "画面が開かない場合は、電波のよい場所で開き直してください。",
+    "通知が届かない場合は、端末設定でKenSapoの通知が許可されているか確認してください。",
+    "iPhoneではホーム画面に追加したKenSapoから通知をオンにしてください。"
+  ],
+  "emergencyNote": "全員がログインできない、または予定・写真・日報が保存できない場合は、上記窓口へ優先してご連絡ください。"
+}

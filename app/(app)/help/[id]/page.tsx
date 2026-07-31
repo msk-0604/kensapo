@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { HelpArticleView } from "@/components/help/HelpArticleView";
 import { getAllArticleIds, getArticle, getManual } from "@/lib/help/load";
+import { getProfile } from "@/lib/auth";
+import { filterByRole } from "@/lib/help/search";
+import type { HelpRole } from "@/lib/help/types";
 
 export async function generateStaticParams() {
   const ids = await getAllArticleIds();
@@ -14,13 +17,21 @@ export default async function HelpArticlePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const article = await getArticle(id);
+  const [article, profile] = await Promise.all([getArticle(id), getProfile()]);
   if (!article) notFound();
 
+  const role: HelpRole = profile?.role === "admin" ? "admin" : "member";
+  if (article.roles?.length && !article.roles.includes(role)) {
+    redirect("/help");
+  }
+
   const manual = await getManual();
-  const related = (article.related ?? [])
-    .map((rid) => manual.articles.find((a) => a.id === rid))
-    .filter((a): a is NonNullable<typeof a> => Boolean(a));
+  const related = filterByRole(
+    (article.related ?? [])
+      .map((rid) => manual.articles.find((a) => a.id === rid))
+      .filter((a): a is NonNullable<typeof a> => Boolean(a)),
+    role
+  );
 
   return (
     <>

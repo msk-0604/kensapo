@@ -107,8 +107,11 @@ export async function DashboardDetails() {
             {stats.inProgressSchedules.map((s) => (
               <li key={s.id}>
                 <Card className="!p-4">
-                  <p className="font-bold text-navy-950">
-                    {s.title || s.project_name}
+                  <p className="text-base font-bold text-navy-700">
+                    {s.project_name}
+                  </p>
+                  <p className="mt-1 text-xl font-bold text-navy-950">
+                    {s.worker_name || "作業員未割当"}
                   </p>
                   <p className="mt-1 text-base text-green-800">
                     作業中

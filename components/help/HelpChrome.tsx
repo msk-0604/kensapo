@@ -1,12 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { HelpArticle, HelpFaqItem } from "@/lib/help/types";
+import { useEffect, useMemo, useState } from "react";
+import type { HelpArticle, HelpFaqItem, HelpRole } from "@/lib/help/types";
+import { HELP_DATA_URLS } from "@/lib/help/paths";
+import { filterByRole } from "@/lib/help/search";
 import { HelpCommandPalette } from "@/components/help/HelpCommandPalette";
 import { HelpContextPanel } from "@/components/help/HelpContextPanel";
 import { HelpTour } from "@/components/help/HelpTour";
 
-export function HelpChrome() {
+function asHelpRole(role?: string): HelpRole {
+  return role === "admin" ? "admin" : "member";
+}
+
+export function HelpChrome({ role }: { role?: string }) {
+  const helpRole = asHelpRole(role);
   const [articles, setArticles] = useState<HelpArticle[]>([]);
   const [faq, setFaq] = useState<HelpFaqItem[]>([]);
 
@@ -15,8 +22,8 @@ export function HelpChrome() {
     void (async () => {
       try {
         const [manualRes, faqRes] = await Promise.all([
-          fetch("/help/data/manual.json"),
-          fetch("/help/data/faq.json"),
+          fetch(HELP_DATA_URLS.manual),
+          fetch(HELP_DATA_URLS.faq),
         ]);
         if (!manualRes.ok || !faqRes.ok) return;
         const manual = (await manualRes.json()) as { articles: HelpArticle[] };
@@ -33,10 +40,19 @@ export function HelpChrome() {
     };
   }, []);
 
+  const visibleArticles = useMemo(
+    () => filterByRole(articles, helpRole),
+    [articles, helpRole]
+  );
+  const visibleFaq = useMemo(
+    () => filterByRole(faq, helpRole),
+    [faq, helpRole]
+  );
+
   return (
     <>
-      <HelpCommandPalette articles={articles} faq={faq} />
-      <HelpContextPanel articles={articles} />
+      <HelpCommandPalette articles={visibleArticles} faq={visibleFaq} />
+      <HelpContextPanel articles={visibleArticles} faq={visibleFaq} />
       <HelpTour />
     </>
   );

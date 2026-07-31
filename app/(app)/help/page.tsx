@@ -2,10 +2,17 @@ import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { HelpHomeClient } from "@/components/help/HelpHomeClient";
 import { HelpPrintActions } from "@/components/help/HelpPrintActions";
+import { HelpFavoritesList } from "@/components/help/HelpFavoritesList";
 import { getManual } from "@/lib/help/load";
+import { getProfile } from "@/lib/auth";
+import { filterByRole } from "@/lib/help/search";
+import type { HelpRole } from "@/lib/help/types";
 
 export default async function HelpPage() {
-  const manual = await getManual();
+  const [manual, profile] = await Promise.all([getManual(), getProfile()]);
+  const role: HelpRole = profile?.role === "admin" ? "admin" : "member";
+  const categories = filterByRole(manual.categories, role);
+  const articles = filterByRole(manual.articles, role);
 
   return (
     <>
@@ -30,14 +37,26 @@ export default async function HelpPage() {
               >
                 動画マニュアル
               </Link>
+              <Link
+                href="/help/contact"
+                className="font-bold text-navy-900 underline"
+              >
+                お問い合わせ
+              </Link>
+              <Link
+                href="/help/changelog"
+                className="font-bold text-navy-900 underline"
+              >
+                更新履歴
+              </Link>
             </div>
           </div>
         }
       />
-      <HelpHomeClient
-        categories={manual.categories}
-        articles={manual.articles}
-      />
+      <div className="mb-8">
+        <HelpFavoritesList articles={articles} />
+      </div>
+      <HelpHomeClient categories={categories} articles={articles} />
     </>
   );
 }

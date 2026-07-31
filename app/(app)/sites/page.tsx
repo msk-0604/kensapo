@@ -5,8 +5,10 @@ import { Button } from "@/components/ui/Button";
 import { StatusBadge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { HintBox } from "@/components/ui/HintBox";
+import { WorkerNameList } from "@/components/ui/WorkerNameList";
 import { getSites } from "@/lib/sites";
-import { formatDate } from "@/lib/utils";
+import { getSchedulesForDate, workerNamesByProject } from "@/lib/schedules";
+import { formatDate, todayISO } from "@/lib/utils";
 
 const INTENT_MESSAGES: Record<string, { title: string; body: string }> = {
   photo: {
@@ -25,7 +27,11 @@ export default async function SitesPage({
   searchParams: Promise<{ intent?: string }>;
 }) {
   const { intent } = await searchParams;
-  const sites = await getSites();
+  const [sites, todaySchedules] = await Promise.all([
+    getSites(),
+    getSchedulesForDate(todayISO()).catch(() => []),
+  ]);
+  const todayWorkers = workerNamesByProject(todaySchedules);
   const intentMessage = intent ? INTENT_MESSAGES[intent] : null;
 
   return (
@@ -71,48 +77,64 @@ export default async function SitesPage({
           }
         />
       ) : (
-        <ul className="space-y-4">
-          {sites.map((site) => (
-            <li key={site.id}>
-              <Link
-                href={
-                  intent === "photo"
-                    ? `/sites/${site.id}/photos`
-                    : intent === "report"
-                      ? `/sites/${site.id}/reports/new`
-                      : `/sites/${site.id}`
-                }
-              >
-                <Card className="transition-colors hover:border-navy-700">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-xl font-bold text-navy-950">
-                        {site.name}
-                      </h3>
-                      <p className="mt-2 text-base text-gray-600">
-                        {site.address || "住所は未入力です"}
-                      </p>
-                      <p className="mt-2 text-base text-gray-500">
-                        担当：{site.manager_name || "未設定"}
-                      </p>
-                      <p className="mt-1 text-base text-gray-500">
-                        工期：{formatDate(site.start_date)} 〜{" "}
-                        {formatDate(site.end_date)}
-                      </p>
-                    </div>
-                    <StatusBadge status={site.status} />
-                  </div>
-                  <p className="mt-4 text-base font-bold text-navy-900">
-                    {intent === "photo"
-                      ? "この現場に写真を追加する →"
+        <ul className="space-y-5">
+          {sites.map((site) => {
+            const workers = todayWorkers[site.id] ?? [];
+            return (
+              <li key={site.id}>
+                <Link
+                  href={
+                    intent === "photo"
+                      ? `/sites/${site.id}/photos`
                       : intent === "report"
-                        ? "この現場の日報を書く →"
-                        : "この現場の詳細を見る →"}
-                  </p>
-                </Card>
-              </Link>
-            </li>
-          ))}
+                        ? `/sites/${site.id}/reports/new`
+                        : `/sites/${site.id}`
+                  }
+                  className="tap-press block"
+                >
+                  <Card className="transition-colors hover:border-navy-700">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-base font-bold text-navy-700">現場</p>
+                        <h3 className="mt-1 text-2xl font-bold leading-snug text-navy-950">
+                          {site.name}
+                        </h3>
+                        <p className="mt-2 text-base text-gray-600">
+                          {site.address || "住所は未入力です"}
+                        </p>
+                        <p className="mt-2 text-base text-gray-500">
+                          現場担当：{site.manager_name || "未設定"}
+                        </p>
+                        <p className="mt-1 text-base text-gray-500">
+                          工期：{formatDate(site.start_date)} 〜{" "}
+                          {formatDate(site.end_date)}
+                        </p>
+                      </div>
+                      <StatusBadge status={site.status} />
+                    </div>
+
+                    <div className="mt-4 rounded-2xl border-2 border-gray-100 bg-gray-50 px-4 py-3">
+                      <p className="mb-2 text-base font-bold text-gray-700">
+                        今日の作業員
+                      </p>
+                      <WorkerNameList
+                        names={workers}
+                        emptyLabel="今日の予定・作業員はまだありません"
+                      />
+                    </div>
+
+                    <p className="mt-4 text-base font-bold text-navy-900">
+                      {intent === "photo"
+                        ? "この現場に写真を追加する →"
+                        : intent === "report"
+                          ? "この現場の日報を書く →"
+                          : "この現場の詳細を見る →"}
+                    </p>
+                  </Card>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </>

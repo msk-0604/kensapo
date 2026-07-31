@@ -36,11 +36,11 @@ export function HelpCommandPalette({ articles, faq }: Props) {
   }, [close]);
 
   const articleHits = useMemo(
-    () => searchArticles(articles, query).slice(0, 6),
+    () => (query.trim() ? searchArticles(articles, query) : articles).slice(0, 6),
     [articles, query]
   );
   const faqHits = useMemo(
-    () => searchFaq(faq, query).slice(0, 4),
+    () => (query.trim() ? searchFaq(faq, query) : faq).slice(0, 4),
     [faq, query]
   );
 

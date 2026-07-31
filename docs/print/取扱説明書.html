@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KenSapo 取扱説明書</title>
+  <link rel="stylesheet" href="./print.css" />
+  <style>
+    .shot { margin: 12pt 0; }
+    .shot-ph {
+      border: 2px dashed #9ca3af;
+      background: #f9fafb;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #4b5563;
+      font-size: 10pt;
+      padding: 12pt;
+      border-radius: 8px;
+    }
+    hr { border: 0; border-top: 1px solid #d1d5db; margin: 18pt 0; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button type="button" onclick="window.print()">PDFに保存 / 印刷</button>
+    <a class="secondary" href="./index.html">印刷用一覧へ</a>
+  </div>
+  <h1>KenSapo 取扱説明書</h1>
+<p><strong>建設業向け 現場スケジュール管理システム</strong></p>
+<p>本番URL: https://kensapo.vercel.app</p>
+<p>更新日: 2026年7月</p>
+<hr />
+<h1>1. 表紙</h1>
+<figure class="shot"><div class="shot-ph">【画像】00-cover.png<br/><span>表紙イメージ</span></div></figure>
+<p><strong>KenSapo（ケンサポ）</strong>  </p>
+<p>建設現場の予定・写真・日報・工事進行を、スマートフォンでまとめて管理するシステムです。</p>
+<p>この冊子は、紙またはPDFで手元に置いて使うための取扱説明書です。</p>
+<table><tbody>
+<tr><th>項目</th><th>内容</th></tr>
+<tr><td>サービス名</td><td>KenSapo</td></tr>
+<tr><td>対象</td><td>建設会社の管理者・現場監督・作業員・事務担当</td></tr>
+<tr><td>使い方</td><td>スマホを主に想定（PCのブラウザでも利用可）</td></tr>
+</tbody></table>
+<p><strong>この冊子の読み方</strong></p>
+<ul>
+<li>スマホ操作は「タップ」、PC操作は「クリック」と書きます。</li>
+<li>画面下の4つのメニューは、いつも同じ場所にあります。</li>
+<li>「注意」は失敗しやすいポイントです。必ず読んでください。</li>
+</ul>
+<hr />
+<h1>2. KenSapoとは</h1>
+<p>KenSapoでできることは、次のとおりです。</p>
+<ul>
+<li>現場の登録と確認</li>
+<li>作業員の登録</li>
+<li>作業予定の登録と確認</li>
+<li>作業の開始・終了の記録</li>
+<li>現場写真の保存</li>
+<li>日報の作成</li>
+<li>工事進行チェックの更新</li>
+<li>同じ会社のメンバーへの通知</li>
+</ul>
+<p><strong>できないこと（掲載しません）</strong></p>
+<ul>
+<li>AIによる報告書の自動作成（機能はありません）</li>
+<li>オフラインでの利用（インターネットが必要です）</li>
+</ul>
+<figure class="shot"><div class="shot-ph">【画像】02-dashboard.png<br/><span>ホーム画面の全体像</span></div></figure>
+<hr />
+<h1>3. 推奨環境</h1>
+<table><tbody>
+<tr><th>項目</th><th>内容</th></tr>
+<tr><td>端末</td><td>iPhone、Android、PC</td></tr>
+<tr><td>ブラウザ</td><td>各端末の標準ブラウザ（Safari / Chrome など）</td></tr>
+<tr><td>通信</td><td>インターネット接続が必要です</td></tr>
+<tr><td>表示</td><td>ホーム画面に追加すると、アプリのように開けます</td></tr>
+</tbody></table>
+<p><strong>iPhoneの場合（おすすめ）</strong></p>
+<ol>
+<li>Safariで https://kensapo.vercel.app を開きます。</li>
+<li>共有ボタンをタップします。</li>
+<li>「ホーム画面に追加」をタップします。</li>
+<li>以後はホーム画面のKenSapoから開きます。</li>
+</ol>
+<p><strong>Androidの場合</strong></p>
+<ol>
+<li>ChromeでKenSapoを開きます。</li>
+<li>メニューから「ホーム画面に追加」または「アプリをインストール」を選びます。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>通知を使う場合、iPhoneはホーム画面から起動したKenSapoで設定してください。</li>
+<li>電波の弱い場所では、保存に失敗することがあります。</li>
+</ul>
+<hr />
+<h1>4. ログイン方法</h1>
+<p>URL: `/login`  </p>
+<p>（https://kensapo.vercel.app/login）</p>
+<figure class="shot"><div class="shot-ph">【画像】01-login.png<br/><span>ログイン画面</span></div></figure>
+<h2>すでにアカウントがある場合</h2>
+<ol>
+<li>KenSapoを開きます。</li>
+<li>「ログイン」タブを選びます。</li>
+<li>「メールアドレス」と「パスワード」を入力します。</li>
+<li>「ログイン」をタップ（PCではクリック）します。</li>
+</ol>
+<h2>初めて会社を登録する場合（管理者）</h2>
+<ol>
+<li>「新規登録」タブを選びます。</li>
+<li>「会社名」「お名前」「メールアドレス」「パスワード」を入力します。</li>
+<li>「アカウント作成」をタップします。</li>
+<li>登録後、ログインして使い始めます。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>パスワードはお客様自身で管理してください。</li>
+<li>新規登録で作られる最初のアカウントは、権限が「管理者」になります。</li>
+<li>ログイン画面に顔認証ボタンは出ていません。顔認証は「設定」から登録する補助機能です。</li>
+</ul>
+<hr />
+<h1>5. ホーム画面の見方</h1>
+<p>URL: `/dashboard`  </p>
+<p>画面下メニューの「ホーム」</p>
+<figure class="shot"><div class="shot-ph">【画像】02-dashboard.png<br/><span>ホーム画面</span></div></figure>
+<p>ホームには、今日使う操作が並んでいます。</p>
+<p>主なボタン</p>
+<ul>
+<li>「今日の予定を見る」… 予定画面へ進みます</li>
+<li>「写真を撮る」… 現場を選んで写真を追加します</li>
+<li>「現場を見る」… 現場一覧へ進みます</li>
+</ul>
+<p>画面には、今日の予定や進行中の作業も表示されます。</p>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>やりたい操作が分からないときは、まずホームの大きなボタンを押してください。</li>
+</ul>
+<hr />
+<h1>管理者向け操作と、作業員向け操作のちがい</h1>
+<p>KenSapoは、画面ごとに「管理者だけ見える／見えない」という厳しい制限は、ほぼありません。  </p>
+<p>ただし、現場で役割を分けると使いやすくなります。</p>
+<p>設定画面の「権限」を確認してください。会社を新規登録した人は「管理者」と表示されます。</p>
+<h2>管理者向け（主に行う操作）</h2>
+<ul>
+<li>現場の登録・変更</li>
+<li>作業員の登録</li>
+<li>予定の登録・変更・削除</li>
+<li>会社情報の確認</li>
+<li>通知の案内と確認</li>
+<li>工事進行のチェック項目作成</li>
+</ul>
+<h2>作業員向け（主に行う操作）</h2>
+<ul>
+<li>ログイン</li>
+<li>予定の確認</li>
+<li>作業開始・終了</li>
+<li>現場の確認</li>
+<li>写真の追加</li>
+<li>日報の入力</li>
+<li>工事進行のチェック</li>
+<li>通知の受信</li>
+</ul>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li><strong>現場を削除する機能はありません。</strong> 終わった現場は、状態を「完了」にしてください。</li>
+<li><strong>作業員を後から編集する専用画面はありません。</strong> 登録し直しが必要な場合は管理者へ相談してください。</li>
+</ul>
+<hr />
+<h1>6. 現場管理</h1>
+<h2>6-1. 現場一覧を見る</h2>
+<p>URL: `/sites`  </p>
+<p>画面下メニューの「現場」</p>
+<figure class="shot"><div class="shot-ph">【画像】03-sites-list.png<br/><span>現場一覧</span></div></figure>
+<ol>
+<li>画面下の「現場」をタップします。</li>
+<li>登録済みの現場が一覧で表示されます。</li>
+<li>見たい現場の「この現場の詳細を見る →」をタップします。</li>
+</ol>
+<h2>6-2. 現場を登録する（管理者向け）</h2>
+<p>URL: `/sites/new`</p>
+<figure class="shot"><div class="shot-ph">【画像】04-sites-new.png<br/><span>現場登録画面</span></div></figure>
+<ol>
+<li>「現場」を開きます。</li>
+<li>「新しい現場を登録する」をタップします。</li>
+<li>次の項目を入力します。</li>
+</ol>
+<p>   - 現場の名前（必須）</p>
+<p>   - 住所</p>
+<p>   - 担当者名</p>
+<p>   - 着工日</p>
+<p>   - 完了予定日</p>
+<p>   - 工事の状態（予定／進行中／完了）</p>
+<p>   - メモ（任意）</p>
+<ol>
+<li>「この現場を登録する」をタップします。</li>
+<li>現場の詳細画面が開けば登録完了です。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>「現場の名前」は必ず入力してください。</li>
+<li>保存中は「保存しています」と表示されます。終わるまで待ってください。</li>
+</ul>
+<h2>6-3. 現場の詳細を見る</h2>
+<p>URL: `/sites/（現場ID）`</p>
+<figure class="shot"><div class="shot-ph">【画像】05-sites-detail.png<br/><span>現場詳細</span></div></figure>
+<p>詳細画面では、次ができます。</p>
+<ul>
+<li>住所・担当者・工期・メモの確認</li>
+<li>「写真を追加する」</li>
+<li>「日報を書く」「日報一覧を見る」</li>
+<li>「チェックリストを開く」（工事進行）</li>
+<li>「現場の情報を変更する」</li>
+<li>「予定を追加・変更する」</li>
+</ul>
+<h2>6-4. 現場情報を変更する（管理者向け）</h2>
+<p>URL: `/sites/（現場ID）/edit`</p>
+<ol>
+<li>現場詳細で「現場の情報を変更する」をタップします。</li>
+<li>内容を直します。</li>
+<li>「変更を保存する」をタップします。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>現場の削除ボタンはありません。</li>
+</ul>
+<hr />
+<h1>7. 作業員管理（管理者向け）</h1>
+<h2>7-1. 作業員一覧</h2>
+<p>URL: `/workers`  </p>
+<p>設定 → 「作業員を管理する」</p>
+<figure class="shot"><div class="shot-ph">【画像】06-workers-list.png<br/><span>作業員一覧</span></div></figure>
+<ol>
+<li>画面下の「設定」をタップします。</li>
+<li>「作業員を管理する」をタップします。</li>
+<li>登録済みの作業員が一覧で表示されます。</li>
+</ol>
+<p>表示される情報</p>
+<ul>
+<li>名前</li>
+<li>職種</li>
+<li>電話</li>
+<li>稼働中／休止中</li>
+</ul>
+<h2>7-2. 作業員を登録する</h2>
+<p>URL: `/workers/new`</p>
+<figure class="shot"><div class="shot-ph">【画像】07-workers-new.png<br/><span>作業員登録</span></div></figure>
+<ol>
+<li>作業員一覧で「作業員を登録する」をタップします。</li>
+<li>次を入力します。</li>
+</ol>
+<p>   - 作業員の名前（必須）</p>
+<p>   - 電話番号</p>
+<p>   - 職種（大工／鳶／電気／設備／塗装／左官／その他）</p>
+<p>   - 稼働状況</p>
+<ol>
+<li>「作業員を登録する」をタップします。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>作業員の編集画面は、現在ありません。</li>
+<li>予定に割り当てる作業員は、ここで先に登録しておくと便利です。</li>
+</ul>
+<hr />
+<h1>8. スケジュール管理</h1>
+<h2>8-1. 予定を見る（作業員向け・管理者向け）</h2>
+<p>URL: `/schedule`  </p>
+<p>画面下メニューの「予定」</p>
+<figure class="shot"><div class="shot-ph">【画像】08-schedule.png<br/><span>スケジュール画面</span></div></figure>
+<ol>
+<li>「予定」をタップします。</li>
+<li>日付ごとの予定を確認します。</li>
+<li>「前の週」「今日」「次の週」で週を切り替えられます。</li>
+</ol>
+<h2>8-2. 予定を登録する（管理者向け）</h2>
+<p>URL: `/schedule/new` または予定画面内の登録</p>
+<figure class="shot"><div class="shot-ph">【画像】09-schedule-new.png<br/><span>予定登録</span></div></figure>
+<ol>
+<li>「予定」を開きます。</li>
+<li>「新しい予定を追加する」をタップします。</li>
+<li>次を入力します。</li>
+</ol>
+<p>   - 作業する日</p>
+<p>   - 会社名（任意）</p>
+<p>   - 場所（任意）</p>
+<p>   - 現場名・タイトル（任意）</p>
+<p>   - 現場（必須）</p>
+<p>   - 作業内容</p>
+<p>   - 担当作業員（任意）</p>
+<p>   - 開始予定／終了予定</p>
+<p>   - メモ（任意）</p>
+<ol>
+<li>「この予定を登録する」をタップします。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>「現場（必須）」は、先に現場を登録していないと選べません。</li>
+<li>間違えた予定は「この予定を削除する」で消すことができます（確認が出ます）。</li>
+</ul>
+<hr />
+<h1>9. 写真の登録方法（作業員向け・管理者向け）</h1>
+<p>URL例: `/sites/（現場ID）/photos`  </p>
+<p>ホームの「写真を撮る」からも進めます。</p>
+<figure class="shot"><div class="shot-ph">【画像】10-photos.png<br/><span>写真追加画面</span></div></figure>
+<ol>
+<li>ホームで「写真を撮る」をタップする、または現場詳細で「写真を追加する」をタップします。</li>
+<li>現場を選びます（一覧から選ぶ場合）。</li>
+<li>「写真のタイトル（任意）」「撮影した日」「写真のメモ（任意）」を入力します。</li>
+<li>「写真を選ぶ・撮影する」をタップし、写真を選びます。</li>
+<li>保存が終わるまで待ちます（「写真を保存しています」と表示されます）。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>電波のよい場所で保存してください。</li>
+<li>写真が大きいと失敗することがあります。そのときは再度試してください。</li>
+<li>不要な写真は「この写真を削除する」で消せます。</li>
+</ul>
+<hr />
+<h1>10. 作業開始・終了（作業員向け）</h1>
+<p>場所: 「予定」画面、またはホームの「今日の予定」</p>
+<figure class="shot"><div class="shot-ph">【画像】11-schedule-start.png<br/><span>作業開始</span></div></figure>
+<figure class="shot"><div class="shot-ph">【画像】12-schedule-end.png<br/><span>作業終了</span></div></figure>
+<h2>作業を開始する</h2>
+<ol>
+<li>「予定」または「ホーム」を開きます。</li>
+<li>自分の予定を確認します。</li>
+<li>「作業を開始する」をタップします。</li>
+<li>状態が作業中になり、ボタンが「作業中です」などと変わります。</li>
+</ol>
+<h2>作業を終了する</h2>
+<ol>
+<li>作業が終わったら、同じ予定を開きます。</li>
+<li>「作業を終了する」をタップします。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>開始・終了すると、同じ会社の他の人へ通知が届くことがあります。</li>
+<li>自分の操作の通知は、自分には届きません。</li>
+</ul>
+<hr />
+<h1>11. 日報の作成方法（作業員向け・管理者向け）</h1>
+<h2>11-1. 日報一覧</h2>
+<p>URL: `/sites/（現場ID）/reports`</p>
+<figure class="shot"><div class="shot-ph">【画像】13-reports-list.png<br/><span>日報一覧</span></div></figure>
+<ol>
+<li>「現場」から対象現場を開きます。</li>
+<li>「日報一覧を見る」をタップします。</li>
+</ol>
+<h2>11-2. 日報を書く</h2>
+<p>URL: `/sites/（現場ID）/reports/new`</p>
+<figure class="shot"><div class="shot-ph">【画像】14-reports-new.png<br/><span>日報作成</span></div></figure>
+<ol>
+<li>現場詳細で「日報を書く」をタップします。</li>
+<li>次を入力します。</li>
+</ol>
+<p>   - 作業した日</p>
+<p>   - 天気（晴れ／曇り／雨／雪／強風）</p>
+<p>   - 作業した人数</p>
+<p>   - 今日の作業内容（必須）</p>
+<p>   - 使った資材（任意）</p>
+<p>   - 気になったこと・問題（任意）</p>
+<p>   - 明日の予定（任意）</p>
+<ol>
+<li>「日報を保存する」をタップします。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>AIで日報や報告書を自動作成する機能はありません。手入力で保存します。</li>
+<li>「今日の作業内容」は必須です。</li>
+</ul>
+<hr />
+<h1>12. 工事進行の確認と更新</h1>
+<p>URL: `/sites/（現場ID）/progress`</p>
+<figure class="shot"><div class="shot-ph">【画像】15-progress.png<br/><span>工事進行</span></div></figure>
+<h2>はじめて使うとき（管理者向け）</h2>
+<p>現場詳細に「標準チェック項目を作成する」が出る場合があります。</p>
+<ol>
+<li>現場詳細を開きます。</li>
+<li>「標準チェック項目を作成する」をタップします。</li>
+<li>標準のチェック項目が作成されます。</li>
+<li>以後は「チェックリストを開く」から進めます。</li>
+</ol>
+<h2>チェックを付ける（作業員向け・管理者向け）</h2>
+<ol>
+<li>現場詳細で「チェックリストを開く」をタップします。</li>
+<li>「工事進行状況」画面で、終わった項目をタップします。</li>
+<li>完了／未完了が切り替わります。</li>
+<li>画面上部の「完了 ○件 / 全○件」で進み具合を確認します。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>間違えて付けた場合は、もう一度タップすると戻せます。</li>
+</ul>
+<hr />
+<h1>13. 通知設定</h1>
+<p>URL: `/settings`  </p>
+<p>設定内の「スマホへの通知」</p>
+<figure class="shot"><div class="shot-ph">【画像】16-notifications.png<br/><span>通知設定</span></div></figure>
+<ol>
+<li>画面下の「設定」をタップします。</li>
+<li>「通知をオンにする」をタップします。</li>
+<li>端末の確認で「許可」を選びます。</li>
+</ol>
+<p>通知の例</p>
+<ul>
+<li>予定の開始・終了</li>
+<li>現場や日報、写真、工事進行の更新</li>
+</ul>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>iPhoneでは、ホーム画面に追加したKenSapoから通知をオンにしてください。</li>
+<li>通知は、オンにした端末にだけ届きます。</li>
+<li>自分の操作は自分には通知されません。</li>
+<li>切るときは「通知をオフにする」をタップします。</li>
+</ul>
+<hr />
+<h1>14. プロフィール・設定</h1>
+<p>URL: `/settings`</p>
+<figure class="shot"><div class="shot-ph">【画像】17-settings.png<br/><span>設定画面</span></div></figure>
+<figure class="shot"><div class="shot-ph">【画像】18-profile.png<br/><span>プロフィール表示</span></div></figure>
+<p>設定画面でできること</p>
+<ul>
+<li>「📖 取扱説明書」（アプリ内マニュアル）</li>
+<li>「作業員を管理する」</li>
+<li>スマホへの通知</li>
+<li>顔認証・指紋ログインの登録</li>
+<li>会社情報（会社名）の確認</li>
+<li>プロフィール（お名前・メール・権限）の確認</li>
+<li>「ログアウトする」</li>
+</ul>
+<h2>顔認証・指紋（補助）</h2>
+<ol>
+<li>「設定」を開きます。</li>
+<li>「この端末で顔認証を登録する」をタップします。</li>
+<li>端末の案内に従って登録します。</li>
+</ol>
+<div class="note"><strong>注意</strong></div>
+<ul>
+<li>ログインの基本は、メールアドレスとパスワードです。</li>
+<li>顔認証は補助です。ログイン画面に専用ボタンは出ません。</li>
+</ul>
+<h2>ログアウト</h2>
+<figure class="shot"><div class="shot-ph">【画像】19-logout.png<br/><span>ログアウト</span></div></figure>
+<ol>
+<li>「設定」を一番下までスクロールします。</li>
+<li>「ログアウトする」をタップします。</li>
+</ol>
+<hr />
+<h1>15. よくある質問</h1>
+<p><strong>Q. スマホで使えますか？</strong>  </p>
+<p>A. はい。iPhone・Androidで使えます。ホーム画面に追加すると便利です。</p>
+<p><strong>Q. パスワードを忘れました</strong>  </p>
+<p>A. 画面からの再設定は用意していません。導入時に案内された窓口へ連絡してください。</p>
+<p><strong>Q. 通知が来ません</strong>  </p>
+<p>A. 設定で通知がオンか、端末の許可が出ているかを確認してください。iPhoneはホーム画面追加後にオンにしてください。</p>
+<p><strong>Q. 写真が保存できません</strong>  </p>
+<p>A. 電波のよい場所で再度試し、現場が選ばれているか確認してください。</p>
+<p><strong>Q. AI報告書が作れません</strong>  </p>
+<p>A. KenSapoにAI報告書機能はありません。日報は手入力です。</p>
+<p><strong>Q. データは消えますか？</strong>  </p>
+<p>A. 通常利用中はクラウドに保存されます。解約後の扱い・保存期間は契約内容に従ってください。</p>
+<p><strong>Q. 予定や現場が見つかりません</strong>  </p>
+<p>A. 同じ会社のアカウントでログインしているか確認してください。会社が違うとデータは分かれます。</p>
+<hr />
+<h1>16. トラブル対応</h1>
+<table><tbody>
+<tr><th>症状</th><th>まず試すこと</th></tr>
+<tr><td>ログインできない</td><td>メールとパスワード、ログイン／新規登録タブの取り違えを確認</td></tr>
+<tr><td>画面が開かない</td><td>電波を確認し、アプリを閉じて開き直す</td></tr>
+<tr><td>保存が終わらない</td><td>電波を確認し、しばらく待ってから再度保存</td></tr>
+<tr><td>通知が届かない</td><td>設定の通知オン、端末の許可、iPhoneはホーム画面起動</td></tr>
+<tr><td>写真が上がらない</td><td>サイズ・電波・現場選択を確認</td></tr>
+<tr><td>予定がない</td><td>管理者が予定を登録しているか確認</td></tr>
+</tbody></table>
+<p>それでも解決しない場合は、次の「お問い合わせ」へ連絡してください。</p>
+<hr />
+<h1>17. お問い合わせ</h1>
+<p>連絡時に伝えると早い情報</p>
+<ol>
+<li>会社名</li>
+<li>お名前</li>
+<li>使っている端末（iPhone / Android / PC）</li>
+<li>どの画面か</li>
+<li>何をしたか</li>
+<li>表示された文言、またはスクリーンショット</li>
+</ol>
+<p>受付時間の目安: 平日 9:00〜17:00（祝日を除く）</p>
+<p>※ 実際の電話・メール・LINEは、導入時に渡された「問い合わせ先案内」を見てください。</p>
+<p>本番URL: https://kensapo.vercel.app</p>
+<hr />
+<p>以上</p>
+</body>
+</html>
