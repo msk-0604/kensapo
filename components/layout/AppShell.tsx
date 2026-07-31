@@ -1,13 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, Calendar, Home, MapPin, Settings } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import { registerPushServiceWorker } from "@/lib/push/client";
-import { HelpChrome } from "@/components/help/HelpChrome";
+
+const HelpChrome = dynamic(
+  () =>
+    import("@/components/help/HelpChrome").then((m) => ({
+      default: m.HelpChrome,
+    })),
+  { ssr: false }
+);
 
 const navItems = [
   { href: "/dashboard", label: "ホーム", Icon: Home },
@@ -18,56 +25,41 @@ const navItems = [
 
 export function AppShell({
   children,
-  userId,
   userName: initialUserName,
   companyName: initialCompanyName,
+  role,
 }: {
   children: React.ReactNode;
   userId: string;
   userName?: string;
   companyName?: string;
+  role?: string;
 }) {
   const pathname = usePathname();
-  const [userName, setUserName] = useState(initialUserName ?? "");
-  const [companyName, setCompanyName] = useState(initialCompanyName ?? "");
+  const [userName] = useState(initialUserName ?? "");
+  const [companyName] = useState(initialCompanyName ?? "");
   const isPrintView = pathname.includes("/pdf");
   const isHelp = pathname.startsWith("/help");
 
   useEffect(() => {
-    void registerPushServiceWorker();
-  }, []);
-
-  useEffect(() => {
-    if (initialUserName) return;
-
-    let cancelled = false;
-    void (async () => {
-      try {
-        const supabase = createClient();
-        const { data } = await supabase
-          .from("profiles")
-          .select("name, companies(name)")
-          .eq("id", userId)
-          .single();
-        if (cancelled || !data) return;
-        const row = data as {
-          name: string;
-          companies: { name: string } | { name: string }[] | null;
-        };
-        const company = Array.isArray(row.companies)
-          ? row.companies[0]
-          : row.companies;
-        setUserName(row.name);
-        setCompanyName(company?.name ?? "");
-      } catch {
-        // 表示名の取得に失敗しても画面は使える
-      }
-    })();
-
-    return () => {
-      cancelled = true;
+    const run = () => {
+      void registerPushServiceWorker();
     };
-  }, [userId, initialUserName]);
+    const w = window as Window &
+      typeof globalThis & {
+        requestIdleCallback?: (
+          cb: () => void,
+          opts?: { timeout: number }
+        ) => number;
+        cancelIdleCallback?: (id: number) => void;
+      };
+    if (typeof w.requestIdleCallback === "function") {
+      const id = w.requestIdleCallback(run, { timeout: 2500 });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const timer = window.setTimeout(run, 1200);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   if (isPrintView) {
     return (
@@ -84,14 +76,17 @@ export function AppShell({
             isHelp ? "max-w-4xl" : "max-w-lg"
           )}
         >
-          <Link href="/dashboard" className="text-2xl font-bold text-navy-950">
+          <Link
+            href="/dashboard"
+            className="tap-press text-2xl font-bold text-navy-950"
+          >
             KenSapo
           </Link>
           <div className="flex items-center gap-3">
             <Link
               href="/help"
               className={cn(
-                "flex min-h-12 items-center gap-2 rounded-2xl border-2 px-3 py-2 text-base font-bold transition-colors",
+                "tap-press flex min-h-12 items-center gap-2 rounded-2xl border-2 px-3 py-2 text-base font-bold transition-colors",
                 isHelp
                   ? "border-navy-900 bg-navy-900 text-white"
                   : "border-gray-300 bg-white text-navy-900 hover:bg-gray-50"
@@ -134,8 +129,9 @@ export function AppShell({
               <Link
                 key={href}
                 href={href}
+                prefetch
                 className={cn(
-                  "flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center transition-colors",
+                  "tap-press flex min-h-[5rem] flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-center transition-colors",
                   active
                     ? "bg-navy-900 text-white"
                     : "bg-gray-100 text-gray-800 hover:bg-gray-200"
@@ -149,7 +145,7 @@ export function AppShell({
         </div>
       </nav>
 
-      <HelpChrome />
+      <HelpChrome role={role} />
     </div>
   );
 }

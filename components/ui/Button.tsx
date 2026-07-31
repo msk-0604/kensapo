@@ -18,7 +18,8 @@ const variants: Record<Variant, string> = {
     "bg-navy-900 text-white hover:bg-navy-800 active:bg-navy-950 disabled:bg-gray-300 disabled:text-gray-500",
   secondary:
     "bg-white text-navy-900 border-2 border-gray-300 hover:bg-gray-50 active:bg-gray-100",
-  ghost: "bg-transparent text-navy-900 hover:bg-gray-100 border-2 border-transparent",
+  ghost:
+    "bg-transparent text-navy-900 hover:bg-gray-100 border-2 border-transparent",
   danger:
     "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 border-2 border-red-600",
 };
@@ -36,13 +37,13 @@ export function Button({
   fullWidth,
   disabled,
   children,
+  type = "button",
   ...props
 }: ButtonProps) {
   return (
     <button
-      type="button"
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-2xl transition-colors disabled:cursor-not-allowed",
+        "tap-press inline-flex items-center justify-center gap-2 rounded-2xl transition-colors disabled:cursor-not-allowed",
         variants[variant],
         sizes[size],
         fullWidth && "w-full",
@@ -50,6 +51,7 @@ export function Button({
       )}
       disabled={disabled || loading}
       {...props}
+      type={type}
     >
       {loading ? (
         <span className="h-6 w-6 animate-spin rounded-full border-[3px] border-current border-t-transparent" />

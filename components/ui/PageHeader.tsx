@@ -20,7 +20,7 @@ export function PageHeader({
       {backHref ? (
         <Link
           href={backHref}
-          className="mb-5 flex min-h-[4rem] w-full items-center justify-center rounded-2xl border-2 border-gray-300 bg-white px-5 text-xl font-bold text-navy-900 transition-colors hover:bg-gray-50 active:bg-gray-100"
+          className="tap-press mb-5 flex min-h-[4rem] w-full items-center justify-center rounded-2xl border-2 border-gray-300 bg-white px-5 text-xl font-bold text-navy-900 transition-colors hover:bg-gray-50 active:bg-gray-100"
         >
           ← {backLabel}
         </Link>

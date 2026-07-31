@@ -130,7 +130,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
           <button
             type="button"
             onClick={() => setMode("login")}
-            className={`flex min-h-[3.5rem] flex-1 items-center justify-center rounded-xl text-lg font-bold transition-colors ${
+            className={`tap-press flex min-h-[3.5rem] flex-1 items-center justify-center rounded-xl text-lg font-bold transition-colors ${
               mode === "login"
                 ? "bg-navy-900 text-white"
                 : "text-gray-600 hover:text-gray-800"
@@ -141,7 +141,7 @@ export function LoginForm({ supabaseUrl, supabaseAnonKey }: LoginFormProps) {
           <button
             type="button"
             onClick={() => setMode("signup")}
-            className={`flex min-h-[3.5rem] flex-1 items-center justify-center rounded-xl text-lg font-bold transition-colors ${
+            className={`tap-press flex min-h-[3.5rem] flex-1 items-center justify-center rounded-xl text-lg font-bold transition-colors ${
               mode === "signup"
                 ? "bg-navy-900 text-white"
                 : "text-gray-600 hover:text-gray-800"
