@@ -3,17 +3,23 @@
 本番の `/schedule` はログイン必須のため、ChatGPTのブラウズではログイン画面に飛ばされます。  
 そのため **ログイン不要のプレビュー** を用意しています。
 
-## 公開URL（デプロイ後）
+## いちばん確実（ChatGPT向け）
+
+ChatGPTのブラウズは Next.js の `/preview` を開けないことが多いです。  
+**静的HTML（1枚に4画面）を渡してください。**
+
+https://kensapo.vercel.app/review/kensapo-schedule.html
+
+## 予備URL（自分のブラウザ用）
 
 | 画面 | URL |
 |------|-----|
-| 目次 | https://kensapo.vercel.app/preview |
+| 静的レビュー（推奨） | https://kensapo.vercel.app/review/kensapo-schedule.html |
+| 目次（Next） | https://kensapo.vercel.app/preview |
 | 予定一覧 | https://kensapo.vercel.app/preview/schedule |
 | 予定詳細 | https://kensapo.vercel.app/preview/schedule/detail |
 | 予定登録 | https://kensapo.vercel.app/preview/schedule/new |
 | 予定編集 | https://kensapo.vercel.app/preview/schedule/edit |
-
-ローカル確認: `http://localhost:3000/preview`
 
 ## ChatGPTに貼る文
 
@@ -21,17 +27,14 @@
 あなたは建設業向け現場アプリ「KenSapo」のUIレビュアーです。
 対象ユーザーは60代の現場監督・作業員です。文字とボタンは大きめです。
 
-次の公開プレビュー（ログイン不要・ダミーデータ）を開き、デザイン・操作性・現場目線・納品前の修正点を具体的に指摘してください。
+次の静的HTML（ログイン不要・ダミー・スマホ幅想定）を開いてレビューしてください。
+https://kensapo.vercel.app/review/kensapo-schedule.html
 
-【スマホ幅を想定】
-ブラウザ幅を約390pxにするか、開発者ツールのモバイル表示で見てください。
-
-【見る画面】
-1. 予定一覧: https://kensapo.vercel.app/preview/schedule
-2. 予定詳細（開始・終了）: https://kensapo.vercel.app/preview/schedule/detail
-3. 予定登録: https://kensapo.vercel.app/preview/schedule/new
-4. 予定編集: https://kensapo.vercel.app/preview/schedule/edit
-5. 目次: https://kensapo.vercel.app/preview
+この1ページに次の4画面があります。
+1. 予定一覧（カレンダー＋カード）
+2. 予定詳細（開始・終了）
+3. 予定登録
+4. 予定編集
 
 【レビュー観点】
 - 一目で何をする画面か分かるか

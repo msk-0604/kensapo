@@ -26,17 +26,14 @@ const SCREENS = [
 const CHATGPT_PROMPT = `あなたは建設業向け現場アプリ「KenSapo」のUIレビュアーです。
 対象ユーザーは60代の現場監督・作業員です。文字とボタンは大きめです。
 
-次の公開プレビュー（ログイン不要・ダミーデータ）を開き、デザイン・操作性・現場目線・納品前の修正点を具体的に指摘してください。
+次の静的HTML（ログイン不要・ダミー・スマホ幅想定）を開いてレビューしてください。
+https://kensapo.vercel.app/review/kensapo-schedule.html
 
-【スマホ幅を想定】
-ブラウザ幅を約390pxにするか、開発者ツールのモバイル表示で見てください。
-
-【見る画面】
-1. 予定一覧: https://kensapo.vercel.app/preview/schedule
-2. 予定詳細（開始・終了）: https://kensapo.vercel.app/preview/schedule/detail
-3. 予定登録: https://kensapo.vercel.app/preview/schedule/new
-4. 予定編集: https://kensapo.vercel.app/preview/schedule/edit
-5. 目次: https://kensapo.vercel.app/preview/page は /preview
+この1ページに次の4画面があります。
+1. 予定一覧（カレンダー＋カード）
+2. 予定詳細（開始・終了）
+3. 予定登録
+4. 予定編集
 
 【レビュー観点】
 - 一目で何をする画面か分かるか
@@ -57,11 +54,19 @@ export default function PreviewIndexPage() {
           予定画面レビュー用
         </h1>
         <p className="mt-2 text-lg text-gray-600">
-          ログインなしで、本番に近い見た目を確認できます。ChatGPTに下の文を貼って、各URLを開かせてください。
+          ChatGPTには静的HTMLのURLを渡してください（Nextの /preview
+          は開けないことが多いです）。
         </p>
+        <a
+          href="/review/kensapo-schedule.html"
+          className="mt-4 block rounded-2xl border-2 border-amber-500 bg-amber-50 px-5 py-5 text-xl font-bold text-amber-950"
+        >
+          ChatGPT用：静的レビューHTMLを開く →
+        </a>
       </section>
 
       <section className="space-y-3">
+        <h2 className="text-lg font-bold text-gray-800">自分用の画面プレビュー</h2>
         {SCREENS.map((s) => (
           <Link
             key={s.href}

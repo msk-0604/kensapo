@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>KenSapo 予定画面レビュー用（静的・ログイン不要）</title>
+  <style>
+    :root {
+      --navy: #1a2744;
+      --navy-dark: #0f1729;
+      --bg: #f5f6f8;
+      --gray: #6b7280;
+      --line: #e5e7eb;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Hiragino Sans", "Noto Sans JP", Meiryo, sans-serif;
+      background: #d1d5db;
+      color: var(--navy-dark);
+      line-height: 1.5;
+    }
+    .banner {
+      background: #fffbeb;
+      border-bottom: 2px solid #f59e0b;
+      padding: 12px 16px;
+      text-align: center;
+      font-weight: 700;
+    }
+    .banner p { margin: 4px 0 0; font-weight: 500; font-size: 14px; color: #92400e; }
+    .phone {
+      max-width: 390px;
+      margin: 16px auto 40px;
+      background: var(--bg);
+      border: 2px solid #9ca3af;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+    }
+    .topbar {
+      background: #fff;
+      border-bottom: 2px solid var(--line);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 22px; font-weight: 800; }
+    .user { text-align: right; font-size: 14px; }
+    .user strong { display: block; font-size: 16px; }
+    .content { padding: 24px 20px 100px; }
+    h1 { font-size: 28px; margin: 0 0 8px; }
+    .desc { color: var(--gray); font-size: 17px; margin: 0 0 20px; }
+    h2.screen-label {
+      max-width: 390px;
+      margin: 32px auto 8px;
+      padding: 0 8px;
+      font-size: 18px;
+      color: #111;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      border-radius: 16px;
+      padding: 18px 16px;
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      border: 2px solid transparent;
+    }
+    .btn-primary { background: var(--navy); color: #fff; }
+    .btn-secondary { background: #fff; color: var(--navy-dark); border-color: #d1d5db; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .hint { text-align: center; color: var(--gray); font-size: 15px; margin: 0 0 20px; font-weight: 600; }
+    .card {
+      background: #fff;
+      border: 2px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .site-banner {
+      background: var(--navy);
+      color: #fff;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+    .site-banner small { opacity: .8; font-weight: 700; }
+    .site-banner strong { display: block; font-size: 22px; margin-top: 4px; }
+    .worker-box {
+      background: rgba(26,39,68,.05);
+      border: 2px solid #bfdbfe;
+      border-radius: 16px;
+      padding: 12px 16px;
+      margin-bottom: 12px;
+    }
+    .worker-box .label { font-size: 14px; font-weight: 700; color: #1e40af; }
+    .worker-box .name { font-size: 24px; font-weight: 800; margin-top: 4px; }
+    .time { font-weight: 800; color: #1e40af; }
+    .title { font-size: 20px; font-weight: 800; margin: 4px 0; }
+    .meta { color: var(--gray); font-size: 15px; }
+    .work {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 12px 0;
+    }
+    .work .label { font-size: 14px; font-weight: 700; color: var(--gray); }
+    .work .body { font-size: 20px; font-weight: 600; margin-top: 4px; }
+    .status { font-size: 17px; font-weight: 800; margin: 8px 0 12px; }
+    .cal { background: #fff; border: 2px solid var(--line); border-radius: 16px; padding: 12px; margin-bottom: 16px; }
+    .cal-nav { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .cal-nav span {
+      border: 2px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 10px;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .cal-month { font-size: 18px; font-weight: 800; }
+    .cal-today {
+      background: var(--navy);
+      color: #fff;
+      text-align: center;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+    .cal-head { text-align: center; font-size: 13px; font-weight: 800; color: var(--gray); padding: 4px 0; }
+    .cal-day {
+      min-height: 52px;
+      border: 2px solid #f3f4f6;
+      background: #f9fafb;
+      border-radius: 10px;
+      text-align: center;
+      padding: 6px 2px;
+      font-weight: 800;
+      font-size: 15px;
+    }
+    .cal-day.muted { color: #9ca3af; background: transparent; border-color: transparent; }
+    .cal-day.selected { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .badge {
+      display: inline-block;
+      margin-top: 4px;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 999px;
+      padding: 1px 6px;
+      font-size: 12px;
+    }
+    .cal-day.selected .badge { background: rgba(255,255,255,.25); }
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-weight: 800; font-size: 17px; margin-bottom: 6px; }
+    .field .box {
+      border: 2px solid #d1d5db;
+      background: #fff;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 18px;
+      min-height: 52px;
+    }
+    .field .box.placeholder { color: #9ca3af; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .bottom {
+      position: sticky;
+      bottom: 0;
+      background: #fff;
+      border-top: 2px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 10px 8px 14px;
+    }
+    .bottom div {
+      min-height: 64px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      background: #f3f4f6;
+    }
+    .bottom .active { background: var(--navy); color: #fff; }
+    .toc {
+      max-width: 720px;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      border: 2px solid #d1d5db;
+    }
+    .toc h1 { font-size: 22px; }
+    .toc ol { font-size: 16px; line-height: 1.8; }
+    .toc code { background: #f3f4f6; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    KenSapo 予定画面レビュー用（静的HTML・ログイン不要・ダミー）
+    <p>ChatGPTはこのページを直接読めます。スマホ幅（約390px）を想定した見た目です。</p>
+  </div>
+
+  <div class="toc">
+    <h1>レビュー対象（この1ページに4画面）</h1>
+    <ol>
+      <li>予定一覧（カレンダー＋カード）</li>
+      <li>予定詳細（開始・終了）</li>
+      <li>予定登録</li>
+      <li>予定編集</li>
+    </ol>
+    <p>対象ユーザー: 60代の現場監督・作業員。価格イメージ: 導入5万＋月3万。</p>
+    <p>観点: 分かりやすさ / 押しやすさ / 作業員名の視認性 / 迷いどころ / 納品前の修正（高中低）</p>
+  </div>
+
+  <h2 class="screen-label">画面1: 予定一覧（全画面・スマホ想定）</h2>
+  <div class="phone" id="list">
+    <div class="topbar">
+      <div class="logo">KenSapo</div>
+      <div class="user"><strong>山田太郎</strong>サンプル建設</div>
+    </div>
+    <div class="content">
+      <h1>今日の行動予定</h1>
+      <p class="desc">2026年8月1日の予定（プレビュー）</p>
+      <div class="btn btn-primary">新しい予定を追加する</div>
+      <p class="hint">日付・現場・作業員を選んで登録します</p>
+
+      <div class="cal">
+        <div class="cal-nav">
+          <span>前の月</span>
+          <div class="cal-month">2026年8月</div>
+          <span>次の月</span>
+        </div>
+        <div class="cal-today">今日の日付に戻る</div>
+        <div class="cal-grid">
+          <div class="cal-head">月</div><div class="cal-head">火</div><div class="cal-head">水</div><div class="cal-head">木</div><div class="cal-head">金</div><div class="cal-head">土</div><div class="cal-head">日</div>
+          <div class="cal-day muted">27</div>
+          <div class="cal-day muted">28<span class="badge">1</span></div>
+          <div class="cal-day muted">29</div>
+          <div class="cal-day muted">30<span class="badge">2</span></div>
+          <div class="cal-day muted">31</div>
+          <div class="cal-day selected">1<span class="badge">2</span></div>
+          <div class="cal-day">2</div>
+          <div class="cal-day">3</div>
+          <div class="cal-day">4</div>
+          <div class="cal-day">5<span class="badge">1</span></div>
+          <div class="cal-day">6</div>
+          <div class="cal-day">7</div>
+          <div class="cal-day">8</div>
+          <div class="cal-day">9</div>
+        </div>
+      </div>
+
+      <div class="btn btn-secondary">作業員の登録・一覧を見る</div>
+
+      <div class="site-banner">
+        <small>現場</small>
+        <strong>○○マンション改修工事</strong>
+      </div>
+
+      <div class="card">
+        <div class="worker-box">
+          <div class="label">作業員</div>
+          <div class="name">佐藤一郎</div>
+        </div>
+        <div class="time">08:30〜17:00</div>
+        <div class="title">給水配管工事</div>
+        <div class="meta">現場：○○マンション改修工事</div>
+        <div class="work">
+          <div class="label">作業内容</div>
+          <div class="body">2階給水配管の接続</div>
+        </div>
+        <div class="status">状態：予定</div>
+        <div class="btn btn-primary">作業を開始する</div>
+        <p class="hint">押すと、関係者に通知が届きます</p>
+        <div class="btn btn-secondary">作業を終了する</div>
+        <p class="hint">作業が終わったことを記録します</p>
+        <div class="btn btn-secondary">内容を変更する</div>
+        <div class="btn btn-danger">この予定を削除する</div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div>ホーム</div><div class="active">予定</div><div>現場</div><div>設定</div>
+    </div>
+  </div>
+
+  <h2 class="screen-label">画面2: 予定詳細（タップ後・開始終了）</h2>
+  <div class="phone" id="detail">
+    <div class="topbar">
+      <div class="logo">KenSapo</div>
+      <div class="user"><strong>山田太郎</strong>サンプル建設</div>
+    </div>
+    <div class="content">
+      <h1>予定の詳細</h1>
+      <p class="desc">一覧の予定を開いたあとの画面イメージです</p>
+      <div class="card">
+        <div class="worker-box">
+          <div class="label">作業員</div>
+          <div class="name">佐藤一郎</div>
+        </div>
+        <div class="time">08:30〜17:00</div>
+        <div class="title">給水配管工事</div>
+        <div class="meta">現場：○○マンション改修工事</div>
+        <div class="work">
+          <div class="label">作業内容</div>
+          <div class="body">2階給水配管の接続</div>
+        </div>
+        <div class="status">状態：予定</div>
+        <div class="btn btn-primary">作業を開始する</div>
+        <p class="hint">押すと、関係者に通知が届きます</p>
+        <div class="btn btn-secondary">作業を終了する</div>
+        <p class="hint">作業が終わったことを記録します</p>
+        <div class="btn btn-secondary">内容を変更する</div>
+        <div class="btn btn-danger">この予定を削除する</div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div>ホーム</div><div class="active">予定</div><div>現場</div><div>設定</div>
+    </div>
+  </div>
+
+  <h2 class="screen-label">画面3: 予定登録</h2>
+  <div class="phone" id="new">
+    <div class="topbar">
+      <div class="logo">KenSapo</div>
+      <div class="user"><strong>山田太郎</strong>サンプル建設</div>
+    </div>
+    <div class="content">
+      <h1>新しい予定を追加する</h1>
+      <p class="desc">現場・作業員・日時を入れて登録します</p>
+      <div class="field"><label>作業する日</label><div class="box">2026-08-02</div></div>
+      <div class="field"><label>会社名（任意）</label><div class="box placeholder">例：○○建設</div></div>
+      <div class="field"><label>場所（任意）</label><div class="box placeholder">例：東京都世田谷区</div></div>
+      <div class="field"><label>現場名・タイトル（任意）</label><div class="box placeholder">　</div></div>
+      <div class="field"><label>現場（必須）</label><div class="box">○○マンション改修工事</div></div>
+      <div class="field"><label>作業内容</label><div class="box placeholder">例：給水配管施工</div></div>
+      <div class="field"><label>担当作業員（任意）</label><div class="box">佐藤一郎</div></div>
+      <div class="row">
+        <div class="field"><label>開始予定</label><div class="box">08:30</div></div>
+        <div class="field"><label>終了予定</label><div class="box">17:00</div></div>
+      </div>
+      <div class="field"><label>メモ（任意）</label><div class="box placeholder">　</div></div>
+      <div class="btn btn-primary">この予定を登録する</div>
+      <p class="hint">日付・現場・作業員を選んで登録します</p>
+    </div>
+    <div class="bottom">
+      <div>ホーム</div><div class="active">予定</div><div>現場</div><div>設定</div>
+    </div>
+  </div>
+
+  <h2 class="screen-label">画面4: 予定編集</h2>
+  <div class="phone" id="edit">
+    <div class="topbar">
+      <div class="logo">KenSapo</div>
+      <div class="user"><strong>山田太郎</strong>サンプル建設</div>
+    </div>
+    <div class="content">
+      <h1>予定を変更する</h1>
+      <p class="desc">登録済みの予定を直す画面です</p>
+      <div class="field"><label>作業する日</label><div class="box">2026-08-01</div></div>
+      <div class="field"><label>会社名（任意）</label><div class="box placeholder">例：○○建設</div></div>
+      <div class="field"><label>場所（任意）</label><div class="box placeholder">例：東京都世田谷区</div></div>
+      <div class="field"><label>現場名・タイトル（任意）</label><div class="box">給水配管工事</div></div>
+      <div class="field"><label>現場（必須）</label><div class="box">○○マンション改修工事</div></div>
+      <div class="field"><label>作業内容</label><div class="box">2階給水配管の接続</div></div>
+      <div class="field"><label>担当作業員（任意）</label><div class="box">佐藤一郎</div></div>
+      <div class="row">
+        <div class="field"><label>開始予定</label><div class="box">08:30</div></div>
+        <div class="field"><label>終了予定</label><div class="box">17:00</div></div>
+      </div>
+      <div class="field"><label>メモ（任意）</label><div class="box placeholder">　</div></div>
+      <div class="row">
+        <div class="btn btn-secondary">やめる</div>
+        <div class="btn btn-primary">変更を保存する</div>
+      </div>
+    </div>
+    <div class="bottom">
+      <div>ホーム</div><div class="active">予定</div><div>現場</div><div>設定</div>
+    </div>
+  </div>
+</body>
+</html>
