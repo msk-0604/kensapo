@@ -33,7 +33,8 @@
   --color-navy-900: var(--navy-900);
   --color-navy-800: var(--navy-800);
   --color-navy-700: var(--navy-700);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP",
+    Meiryo, "Yu Gothic UI", sans-serif;
 }
 
 body {

@@ -11,6 +11,7 @@ import {
 } from "@/lib/security/upload";
 import { notifyCompanyUpdate } from "@/lib/push/client";
 import { Button } from "@/components/ui/Button";
+import { ActionHint } from "@/components/ui/ActionHint";
 import { Input, Textarea } from "@/components/ui/Input";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingScreen } from "@/components/ui/Loading";
@@ -210,6 +211,7 @@ export function PhotoUpload({
           >
             {uploading ? "写真を保存しています" : "写真を選ぶ・撮影する"}
           </Button>
+          <ActionHint>選んだ写真をこの現場に保存します</ActionHint>
         </section>
         {error ? (
           <p className="mt-4 rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3 text-base text-red-700">

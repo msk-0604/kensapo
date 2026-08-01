@@ -115,13 +115,29 @@ export async function getSchedulesForRange(
 }
 
 export function countSchedulesByDate(
-  schedules: ScheduleWithDetails[]
+  schedules: Pick<ScheduleWithDetails, "schedule_date">[]
 ): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const s of schedules) {
     counts[s.schedule_date] = (counts[s.schedule_date] ?? 0) + 1;
   }
   return counts;
+}
+
+/** カレンダー用：日付ごとの件数だけ（軽量） */
+export async function getScheduleCountsForRange(
+  startDate: string,
+  endDate: string
+): Promise<Record<string, number>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("schedules")
+    .select("schedule_date")
+    .gte("schedule_date", startDate)
+    .lte("schedule_date", endDate);
+
+  if (error) throw error;
+  return countSchedulesByDate(data ?? []);
 }
 
 export async function getSchedulesForProject(

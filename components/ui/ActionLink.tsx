@@ -26,6 +26,7 @@ export function ActionLink({
   return (
     <Link
       href={href}
+      prefetch
       className={cn(
         "tap-press flex min-h-[5rem] w-full flex-col items-center justify-center gap-2 rounded-2xl px-6 py-5 text-center transition-colors",
         variants[variant],

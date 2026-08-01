@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
+import { ActionHint } from "@/components/ui/ActionHint";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { todayISO } from "@/lib/utils";
 import { notifyCompanyUpdate } from "@/lib/push/client";
@@ -209,6 +210,9 @@ export function ScheduleForm({
               : "この予定を登録する"}
         </Button>
       </div>
+      {!schedule ? (
+        <ActionHint>日付・現場・作業員を選んで登録します</ActionHint>
+      ) : null}
     </form>
   );
 }

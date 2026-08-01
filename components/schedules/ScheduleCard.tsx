@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { SCHEDULE_STATUS_LABELS } from "@/lib/constants";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { ActionHint } from "@/components/ui/ActionHint";
 import {
   formatDateTimeTime,
   formatTime,
@@ -162,27 +163,35 @@ export function ScheduleCard({
 
       {isToday && schedule.status !== "completed" ? (
         <div className="mt-5 space-y-3">
-          <Button
-            type="button"
-            fullWidth
-            size="lg"
-            loading={loading === "start"}
-            disabled={schedule.status === "in_progress"}
-            onClick={handleStart}
-          >
-            作業を開始する
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            fullWidth
-            size="lg"
-            loading={loading === "end"}
-            disabled={!schedule.actual_start_time && schedule.status !== "in_progress"}
-            onClick={handleEnd}
-          >
-            作業を終了する
-          </Button>
+          <div>
+            <Button
+              type="button"
+              fullWidth
+              size="lg"
+              loading={loading === "start"}
+              disabled={schedule.status === "in_progress"}
+              onClick={handleStart}
+            >
+              作業を開始する
+            </Button>
+            <ActionHint>押すと、関係者に通知が届きます</ActionHint>
+          </div>
+          <div>
+            <Button
+              type="button"
+              variant="secondary"
+              fullWidth
+              size="lg"
+              loading={loading === "end"}
+              disabled={
+                !schedule.actual_start_time && schedule.status !== "in_progress"
+              }
+              onClick={handleEnd}
+            >
+              作業を終了する
+            </Button>
+            <ActionHint>作業が終わったことを記録します</ActionHint>
+          </div>
         </div>
       ) : null}
 

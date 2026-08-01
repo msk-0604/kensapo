@@ -4,7 +4,6 @@ import { todayISO } from "@/lib/utils";
 import type { Project, SitePhoto } from "@/types/database";
 import type { ScheduleWithDetails } from "@/lib/schedules";
 import {
-  getInProgressSchedulesForToday,
   getSchedulesForDate,
 } from "@/lib/schedules";
 import { getAllProjectsProgressSummaries } from "@/lib/progress-checklist";
@@ -31,17 +30,11 @@ export async function getDashboardStats(
   const activeToday = projectList.filter((p) => p.status === "in_progress");
 
   const [
-    { count: scheduleCount },
     { data: todayReports },
     { data: photosRaw },
     todaySchedules,
-    inProgressSchedules,
     siteProgressSummaries,
   ] = await Promise.all([
-    supabase
-      .from("schedules")
-      .select("*", { count: "exact", head: true })
-      .eq("schedule_date", today),
     supabase.from("daily_reports").select("project_id").eq("report_date", today),
     supabase
       .from("site_photos")
@@ -49,7 +42,6 @@ export async function getDashboardStats(
       .order("created_at", { ascending: false })
       .limit(3),
     getSchedulesForDate(today).catch(() => [] as ScheduleWithDetails[]),
-    getInProgressSchedulesForToday().catch(() => [] as ScheduleWithDetails[]),
     getAllProjectsProgressSummaries().catch(() => []),
   ]);
 
@@ -73,9 +65,13 @@ export async function getDashboardStats(
     0
   );
 
+  const inProgressSchedules = todaySchedules.filter(
+    (s) => s.status === "in_progress"
+  );
+
   return {
     todaySiteCount: activeToday.length,
-    todayWorkerCount: scheduleCount ?? 0,
+    todayWorkerCount: todaySchedules.length,
     missingReportCount,
     pendingChecklistCount,
     latestPhotos,

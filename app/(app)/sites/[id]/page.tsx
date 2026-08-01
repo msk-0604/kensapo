@@ -10,7 +10,10 @@ import { SeedProgressButton } from "@/components/progress/SeedProgressButton";
 import { getSite } from "@/lib/sites";
 import { getSchedulesForProject } from "@/lib/schedules";
 import { uniqueWorkerNames } from "@/lib/schedules-group";
-import { getProgressItems, getProgressSummary } from "@/lib/progress-checklist";
+import {
+  calcProgressSummary,
+  getProgressItems,
+} from "@/lib/progress-checklist";
 import { getSiteProgressPercent } from "@/lib/progress";
 import { getProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -26,34 +29,31 @@ export default async function SiteDetailPage({
   const site = await getSite(id);
   if (!site) notFound();
 
-  const profile = await getProfile();
   const supabase = await createClient();
-  const { count: photoCount } = await supabase
-    .from("site_photos")
-    .select("*", { count: "exact", head: true })
-    .eq("project_id", id);
+  const [profile, photoCountRes, reportCountRes, siteSchedules, progressItems] =
+    await Promise.all([
+      getProfile(),
+      supabase
+        .from("site_photos")
+        .select("*", { count: "exact", head: true })
+        .eq("project_id", id),
+      supabase
+        .from("daily_reports")
+        .select("*", { count: "exact", head: true })
+        .eq("project_id", id),
+      getSchedulesForProject(id),
+      getProgressItems(id).catch(() => []),
+    ]);
 
-  const { count: reportCount } = await supabase
-    .from("daily_reports")
-    .select("*", { count: "exact", head: true })
-    .eq("project_id", id);
-
-  const siteSchedules = await getSchedulesForProject(id);
+  const photoCount = photoCountRes.count;
+  const reportCount = reportCountRes.count;
   const progressPercent = getSiteProgressPercent(site);
   const today = todayISO();
   const todaySchedules = siteSchedules.filter((s) => s.schedule_date === today);
   const todayWorkers = uniqueWorkerNames(todaySchedules);
   const upcomingWorkers = uniqueWorkerNames(siteSchedules);
-
-  let checklistSummary = null;
-  try {
-    const items = await getProgressItems(id);
-    if (items.length > 0) {
-      checklistSummary = await getProgressSummary(id);
-    }
-  } catch {
-    checklistSummary = null;
-  }
+  const checklistSummary =
+    progressItems.length > 0 ? calcProgressSummary(progressItems) : null;
 
   return (
     <>

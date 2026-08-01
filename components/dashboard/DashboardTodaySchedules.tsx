@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { ActionHint } from "@/components/ui/ActionHint";
 import {
   formatDateTimeTime,
   formatTime,
@@ -123,29 +124,40 @@ export function DashboardTodaySchedules({
                       {s.schedule_date === todayISO() &&
                       s.status !== "completed" ? (
                         <div className="mt-5 space-y-3">
-                          <Button
-                            type="button"
-                            fullWidth
-                            size="lg"
-                            disabled={s.status === "in_progress"}
-                            onClick={() => quickStart(s.id)}
-                          >
-                            {s.status === "in_progress"
-                              ? "作業中です"
-                              : "作業を開始する"}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            fullWidth
-                            size="lg"
-                            disabled={
-                              !s.actual_start_time && s.status !== "in_progress"
-                            }
-                            onClick={() => quickEnd(s.id)}
-                          >
-                            作業を終了する
-                          </Button>
+                          <div>
+                            <Button
+                              type="button"
+                              fullWidth
+                              size="lg"
+                              disabled={s.status === "in_progress"}
+                              onClick={() => quickStart(s.id)}
+                            >
+                              {s.status === "in_progress"
+                                ? "作業中です"
+                                : "作業を開始する"}
+                            </Button>
+                            <ActionHint>
+                              押すと、関係者に通知が届きます
+                            </ActionHint>
+                          </div>
+                          <div>
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              fullWidth
+                              size="lg"
+                              disabled={
+                                !s.actual_start_time &&
+                                s.status !== "in_progress"
+                              }
+                              onClick={() => quickEnd(s.id)}
+                            >
+                              作業を終了する
+                            </Button>
+                            <ActionHint>
+                              作業が終わったことを記録します
+                            </ActionHint>
+                          </div>
                         </div>
                       ) : null}
                     </Card>

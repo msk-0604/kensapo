@@ -1,7 +1,8 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Project, ProjectStatus } from "@/types/database";
 
-export async function getProjects(): Promise<Project[]> {
+export const getProjects = cache(async (): Promise<Project[]> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("projects")
@@ -10,7 +11,7 @@ export async function getProjects(): Promise<Project[]> {
 
   if (error) throw error;
   return data ?? [];
-}
+});
 
 export async function getProject(id: string): Promise<Project | null> {
   const supabase = await createClient();

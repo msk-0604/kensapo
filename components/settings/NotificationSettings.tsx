@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Bell, BellOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ActionHint } from "@/components/ui/ActionHint";
 import { Card } from "@/components/ui/Card";
 import {
   isPushSupported,
@@ -187,25 +188,31 @@ export function NotificationSettings() {
       ) : null}
 
       {status === "on" ? (
-        <Button
-          type="button"
-          variant="secondary"
-          fullWidth
-          loading={busy}
-          onClick={() => void disableNotifications()}
-        >
-          通知をオフにする
-        </Button>
+        <div>
+          <Button
+            type="button"
+            variant="secondary"
+            fullWidth
+            loading={busy}
+            onClick={() => void disableNotifications()}
+          >
+            通知をオフにする
+          </Button>
+          <ActionHint>通知を止めたいときに押します</ActionHint>
+        </div>
       ) : (
-        <Button
-          type="button"
-          fullWidth
-          loading={busy}
-          disabled={status === "denied"}
-          onClick={() => void enableNotifications()}
-        >
-          通知をオンにする
-        </Button>
+        <div>
+          <Button
+            type="button"
+            fullWidth
+            loading={busy}
+            disabled={status === "denied"}
+            onClick={() => void enableNotifications()}
+          >
+            通知をオンにする
+          </Button>
+          <ActionHint>予定や作業開始をスマホに知らせます</ActionHint>
+        </div>
       )}
 
       {message ? (

@@ -9,6 +9,7 @@ import { todayISO } from "@/lib/utils";
 import { notifyCompanyUpdate } from "@/lib/push/client";
 import { toSaveUserMessage, withTimeout } from "@/lib/ui/user-errors";
 import { Button } from "@/components/ui/Button";
+import { ActionHint } from "@/components/ui/ActionHint";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { HintBox } from "@/components/ui/HintBox";
 
@@ -153,9 +154,12 @@ export function DailyReportForm({
             {error}
           </p>
         ) : null}
-        <Button type="submit" fullWidth loading={loading}>
-          {loading ? "日報を保存しています" : "日報を保存する"}
-        </Button>
+        <div>
+          <Button type="submit" fullWidth loading={loading}>
+            {loading ? "日報を保存しています" : "日報を保存する"}
+          </Button>
+          <ActionHint>今日の作業内容を記録して保存します</ActionHint>
+        </div>
       </form>
     </>
   );

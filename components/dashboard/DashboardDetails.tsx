@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { ProgressCharts } from "@/components/dashboard/ProgressCharts";
+import { DeferredProgressCharts } from "@/components/dashboard/DeferredProgressCharts";
 import { DashboardTodaySchedules } from "@/components/dashboard/DashboardTodaySchedules";
 import { DashboardSiteProgress } from "@/components/dashboard/DashboardSiteProgress";
 import { getSites } from "@/lib/sites";
@@ -17,7 +17,7 @@ async function DashboardCharts() {
 
   return (
     <div className="mb-8 hidden sm:block">
-      <ProgressCharts data={progressData} />
+      <DeferredProgressCharts data={progressData} />
     </div>
   );
 }
@@ -27,10 +27,8 @@ export async function DashboardDetails() {
   let stats: Awaited<ReturnType<typeof getDashboardStats>> | null = null;
 
   try {
-    [sites, stats] = await Promise.all([
-      getSites(),
-      getDashboardStats().catch(() => null),
-    ]);
+    sites = await getSites();
+    stats = await getDashboardStats(sites).catch(() => null);
   } catch {
     return (
       <section className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-5 text-center">

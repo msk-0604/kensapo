@@ -3,22 +3,22 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
+import { ActionHint } from "@/components/ui/ActionHint";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { ScheduleWeekNav } from "@/components/schedules/ScheduleWeekNav";
+import { ScheduleMonthCalendar } from "@/components/schedules/ScheduleMonthCalendar";
 import { ScheduleDayList } from "@/components/schedules/ScheduleDayList";
 import { ScheduleDetailsSkeleton } from "@/components/schedules/ScheduleDetailsSkeleton";
 import { getCachedProfileWithCompany } from "@/lib/auth";
 import { getProjects } from "@/lib/projects";
 import {
-  countSchedulesByDate,
+  getScheduleCountsForRange,
   getSchedulesForDate,
-  getSchedulesForRange,
 } from "@/lib/schedules";
 import { getWorkers } from "@/lib/workers";
 import {
   clampDateISO,
   formatDate,
-  getWeekDatesISO,
+  getMonthMatrixISO,
   todayISO,
 } from "@/lib/utils";
 
@@ -30,26 +30,25 @@ async function ScheduleDetails({
   const profile = await getCachedProfileWithCompany();
   if (!profile) redirect("/login");
 
-  const weekDates = getWeekDatesISO(selectedDate);
-  const weekStart = weekDates[0];
-  const weekEnd = weekDates[6];
+  const monthDates = getMonthMatrixISO(selectedDate);
+  const monthStart = monthDates[0];
+  const monthEnd = monthDates[monthDates.length - 1];
   const isToday = selectedDate === todayISO();
 
-  const [schedules, weekSchedules, workers, projects] = await Promise.all([
+  const [schedules, scheduleCounts, workers, projects] = await Promise.all([
     getSchedulesForDate(selectedDate),
-    getSchedulesForRange(weekStart, weekEnd),
+    getScheduleCountsForRange(monthStart, monthEnd),
     getWorkers(),
     getProjects(),
   ]);
 
-  const scheduleCounts = countSchedulesByDate(weekSchedules);
   const activeWorkers = workers.filter((w) => w.status === "active");
 
   return (
     <>
-      <ScheduleWeekNav
+      <ScheduleMonthCalendar
         selectedDate={selectedDate}
-        weekDates={weekDates}
+        monthDates={monthDates}
         scheduleCounts={scheduleCounts}
       />
 
@@ -121,6 +120,7 @@ export default async function SchedulePage({
             新しい予定を追加する
           </Button>
         </Link>
+        <ActionHint>日付・現場・作業員を選んで登録します</ActionHint>
       </section>
 
       <Suspense

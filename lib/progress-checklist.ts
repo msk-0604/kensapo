@@ -34,10 +34,11 @@ export async function getProgressItems(
 }
 
 export async function getProgressSummary(
-  projectId: string
+  projectId: string,
+  items?: Pick<ProjectProgressItem, "checked">[]
 ): Promise<ProgressSummary> {
-  const items = await getProgressItems(projectId);
-  return calcProgressSummary(items);
+  const list = items ?? (await getProgressItems(projectId));
+  return calcProgressSummary(list);
 }
 
 export async function getAllProjectsProgressSummaries(): Promise<

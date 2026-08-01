@@ -29,6 +29,10 @@ export async function middleware(request: NextRequest) {
   const env = getSupabasePublicEnv();
   const pathname = request.nextUrl.pathname;
 
+  if (pathname.startsWith("/preview")) {
+    return applySecurityHeaders(NextResponse.next({ request }));
+  }
+
   if (!env) {
     if (pathname === "/setup") {
       return applySecurityHeaders(NextResponse.next({ request }));

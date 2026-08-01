@@ -4,21 +4,62 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 
+const CACHE_KEY = "kensapo-db-ok";
+
 export function DbSetupBanner() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/health/db")
-      .then((res) => res.json())
-      .then((data: { ok?: boolean }) => {
-        if (!cancelled) setShow(!data.ok);
-      })
-      .catch(() => {
-        if (!cancelled) setShow(true);
-      });
+
+    try {
+      if (sessionStorage.getItem(CACHE_KEY) === "1") return;
+    } catch {
+      // ignore
+    }
+
+    const run = () => {
+      fetch("/api/health/db")
+        .then((res) => res.json())
+        .then((data: { ok?: boolean }) => {
+          if (cancelled) return;
+          if (data.ok) {
+            try {
+              sessionStorage.setItem(CACHE_KEY, "1");
+            } catch {
+              // ignore
+            }
+            setShow(false);
+          } else {
+            setShow(true);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setShow(true);
+        });
+    };
+
+    const w = window as Window &
+      typeof globalThis & {
+        requestIdleCallback?: (
+          cb: () => void,
+          opts?: { timeout: number }
+        ) => number;
+        cancelIdleCallback?: (id: number) => void;
+      };
+
+    if (typeof w.requestIdleCallback === "function") {
+      const id = w.requestIdleCallback(run, { timeout: 2500 });
+      return () => {
+        cancelled = true;
+        w.cancelIdleCallback?.(id);
+      };
+    }
+
+    const timer = window.setTimeout(run, 1200);
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
   }, []);
 
