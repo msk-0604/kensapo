@@ -12,6 +12,8 @@ import { notifyCompanyUpdate } from "@/lib/push/client";
 type Props = {
   project?: Project;
   companyId: string;
+  /** 保存後の移動先（未指定なら現場詳細へ） */
+  successHref?: string;
 };
 
 const defaultForm = {
@@ -24,7 +26,7 @@ const defaultForm = {
   memo: "",
 };
 
-export function ProjectForm({ project }: Props) {
+export function ProjectForm({ project, successHref }: Props) {
   const router = useRouter();
   const [form, setForm] = useState(
     project
@@ -81,7 +83,7 @@ export function ProjectForm({ project }: Props) {
         tag: `site-${data.id}`,
       });
 
-      router.replace(`/sites/${data.id}`);
+      router.replace(successHref ?? `/sites/${data.id}`);
       router.refresh();
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {

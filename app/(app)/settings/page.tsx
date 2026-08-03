@@ -40,6 +40,14 @@ export default async function SettingsPage() {
         <ActionLink href="/workers" description="作業員の登録・一覧">
           作業員を管理する
         </ActionLink>
+        {profile.role === "admin" ? (
+          <ActionLink
+            href="/pro"
+            description="URL「/pro」・現場の追加と一覧管理"
+          >
+            管理画面（現場追加）
+          </ActionLink>
+        ) : null}
       </section>
 
       <section className="space-y-4">
