@@ -10,10 +10,12 @@ export type ProgressSummary = {
 };
 
 export function calcProgressSummary(
-  items: Pick<ProjectProgressItem, "checked">[]
+  items: Pick<ProjectProgressItem, "checked" | "mark">[]
 ): ProgressSummary {
   const total = items.length;
-  const completed = items.filter((i) => i.checked).length;
+  const completed = items.filter(
+    (i) => i.mark === "ok" || (!i.mark && i.checked)
+  ).length;
   const pending = total - completed;
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
   return { total, completed, pending, percent };
@@ -30,12 +32,19 @@ export async function getProgressItems(
     .order("sort_order", { ascending: true });
 
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).map((row) => {
+    const item = row as ProjectProgressItem;
+    return {
+      ...item,
+      mark: item.mark ?? (item.checked ? "ok" : "none"),
+      remarks: item.remarks ?? null,
+    };
+  });
 }
 
 export async function getProgressSummary(
   projectId: string,
-  items?: Pick<ProjectProgressItem, "checked">[]
+  items?: Pick<ProjectProgressItem, "checked" | "mark">[]
 ): Promise<ProgressSummary> {
   const list = items ?? (await getProgressItems(projectId));
   return calcProgressSummary(list);
@@ -47,14 +56,49 @@ export async function getAllProjectsProgressSummaries(): Promise<
   const supabase = await createClient();
   const { data: rows, error } = await supabase
     .from("project_progress_items")
-    .select("checked, project_id, projects!inner(id, name, status)")
+    .select("checked, mark, project_id, projects!inner(id, name, status)")
     .neq("projects.status", "completed");
 
-  if (error) throw error;
+  if (error) {
+    // mark 列がまだ無い環境向けフォールバック
+    const fallback = await supabase
+      .from("project_progress_items")
+      .select("checked, project_id, projects!inner(id, name, status)")
+      .neq("projects.status", "completed");
+    if (fallback.error) throw fallback.error;
+    const grouped = new Map<
+      string,
+      { project_name: string; items: Pick<ProjectProgressItem, "checked" | "mark">[] }
+    >();
+    for (const row of fallback.data ?? []) {
+      const projectRaw = row.projects as
+        | { id: string; name: string }
+        | { id: string; name: string }[];
+      const project = Array.isArray(projectRaw) ? projectRaw[0] : projectRaw;
+      if (!project) continue;
+      const existing = grouped.get(row.project_id) ?? {
+        project_name: project.name,
+        items: [],
+      };
+      existing.items.push({
+        checked: row.checked,
+        mark: row.checked ? "ok" : "none",
+      });
+      grouped.set(row.project_id, existing);
+    }
+    return Array.from(grouped.entries()).map(([project_id, value]) => ({
+      project_id,
+      project_name: value.project_name,
+      ...calcProgressSummary(value.items),
+    }));
+  }
 
   const grouped = new Map<
     string,
-    { project_name: string; checked: boolean[] }
+    {
+      project_name: string;
+      items: Pick<ProjectProgressItem, "checked" | "mark">[];
+    }
   >();
 
   for (const row of rows ?? []) {
@@ -65,16 +109,19 @@ export async function getAllProjectsProgressSummaries(): Promise<
     if (!project) continue;
     const existing = grouped.get(row.project_id) ?? {
       project_name: project.name,
-      checked: [],
+      items: [],
     };
-    existing.checked.push(row.checked);
+    existing.items.push({
+      checked: row.checked,
+      mark: (row.mark as ProjectProgressItem["mark"]) ?? (row.checked ? "ok" : "none"),
+    });
     grouped.set(row.project_id, existing);
   }
 
   return Array.from(grouped.entries()).map(([project_id, value]) => ({
     project_id,
     project_name: value.project_name,
-    ...calcProgressSummary(value.checked.map((checked) => ({ checked }))),
+    ...calcProgressSummary(value.items),
   }));
 }
 

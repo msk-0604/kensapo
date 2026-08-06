@@ -20,6 +20,7 @@ const defaultForm = {
   name: "",
   address: "",
   manager_name: "",
+  prime_contractor_name: "",
   start_date: "",
   end_date: "",
   status: "not_started" as ProjectStatus,
@@ -34,6 +35,7 @@ export function ProjectForm({ project, successHref }: Props) {
           name: project.name,
           address: project.address ?? "",
           manager_name: project.manager_name ?? "",
+          prime_contractor_name: project.prime_contractor_name ?? "",
           start_date: project.start_date ?? "",
           end_date: project.end_date ?? "",
           status: project.status,
@@ -114,6 +116,12 @@ export function ProjectForm({ project, successHref }: Props) {
         label="担当者名"
         value={form.manager_name}
         onChange={(e) => update("manager_name", e.target.value)}
+      />
+      <Input
+        label="元請け先名"
+        value={form.prime_contractor_name}
+        onChange={(e) => update("prime_contractor_name", e.target.value)}
+        placeholder="例：○○建設株式会社"
       />
       <div className="grid grid-cols-2 gap-3">
         <Input

@@ -6,7 +6,8 @@ export type ScheduleStatus =
   | "in_progress"
   | "completed"
   | "cancelled";
-export type ProgressItemStatus = "pending" | "completed";
+export type ProgressItemStatus = "pending" | "completed" | "attention";
+export type ProgressMark = "none" | "ok" | "attention";
 
 export interface Company {
   id: string;
@@ -29,10 +30,12 @@ export interface Project {
   name: string;
   address: string | null;
   manager_name: string | null;
+  prime_contractor_name: string | null;
   start_date: string | null;
   end_date: string | null;
   status: ProjectStatus;
   memo: string | null;
+  progress_remarks: string | null;
   created_at: string;
 }
 
@@ -76,6 +79,9 @@ export interface ProjectProgressItem {
   section: string | null;
   item_name: string;
   status: ProgressItemStatus;
+  /** 〇=ok / △=attention / 未=none */
+  mark: ProgressMark;
+  remarks: string | null;
   checked: boolean;
   checked_at: string | null;
   checked_by: string | null;

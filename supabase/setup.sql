@@ -24,11 +24,13 @@ CREATE TABLE IF NOT EXISTS projects (
   name TEXT NOT NULL,
   address TEXT,
   manager_name TEXT,
+  prime_contractor_name TEXT,
   start_date DATE,
   end_date DATE,
   status TEXT NOT NULL DEFAULT 'not_started'
     CHECK (status IN ('not_started', 'in_progress', 'completed')),
   memo TEXT,
+  progress_remarks TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -100,7 +102,10 @@ CREATE TABLE IF NOT EXISTS project_progress_items (
   section TEXT,
   item_name TEXT NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending'
-    CHECK (status IN ('pending', 'completed')),
+    CHECK (status IN ('pending', 'completed', 'attention')),
+  mark TEXT NOT NULL DEFAULT 'none'
+    CHECK (mark IN ('none', 'ok', 'attention')),
+  remarks TEXT,
   checked BOOLEAN NOT NULL DEFAULT false,
   checked_at TIMESTAMPTZ,
   checked_by UUID REFERENCES profiles(id),
@@ -136,6 +141,14 @@ ALTER TABLE schedules
   ADD COLUMN IF NOT EXISTS memo TEXT,
   ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'scheduled',
   ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT now();
+
+ALTER TABLE projects
+  ADD COLUMN IF NOT EXISTS prime_contractor_name TEXT,
+  ADD COLUMN IF NOT EXISTS progress_remarks TEXT;
+
+ALTER TABLE project_progress_items
+  ADD COLUMN IF NOT EXISTS mark TEXT NOT NULL DEFAULT 'none',
+  ADD COLUMN IF NOT EXISTS remarks TEXT;
 
 UPDATE schedules SET status = 'scheduled' WHERE status IS NULL;
 UPDATE schedules SET updated_at = COALESCE(updated_at, now());

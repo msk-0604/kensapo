@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { requireApiUser } from "@/lib/security/auth-api";
-import { STANDARD_PROGRESS_ITEMS } from "@/lib/standard-progress-items";
 import type { ProjectStatus } from "@/types/database";
 
 const ALLOWED_STATUS = new Set<ProjectStatus>([
@@ -49,6 +48,7 @@ export async function POST(request: Request) {
     name,
     address: cleanText(body.address, 500),
     manager_name: cleanText(body.manager_name, 100),
+    prime_contractor_name: cleanText(body.prime_contractor_name, 200),
     start_date: cleanDate(body.start_date),
     end_date: cleanDate(body.end_date),
     status,
@@ -68,21 +68,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const rows = STANDARD_PROGRESS_ITEMS.map((item, index) => ({
-    company_id: profile.company_id,
-    project_id: data.id,
-    category: item.category,
-    section: item.section,
-    item_name: item.item_name,
-    sort_order: index,
-  }));
-  const { error: seedError } = await supabase
-    .from("project_progress_items")
-    .insert(rows);
-  if (seedError) {
-    console.error("progress seed failed", seedError.message);
-  }
-
+  // 工程は現場ごとにドラッグ／タップで追加（一括シードは工事進行画面から）
   return NextResponse.json({ ok: true, id: data.id, name: data.name });
 }
 
@@ -118,6 +104,7 @@ export async function PATCH(request: Request) {
     name,
     address: cleanText(body.address, 500),
     manager_name: cleanText(body.manager_name, 100),
+    prime_contractor_name: cleanText(body.prime_contractor_name, 200),
     start_date: cleanDate(body.start_date),
     end_date: cleanDate(body.end_date),
     status,

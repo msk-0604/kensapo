@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ProgressChecklist } from "@/components/progress/ProgressChecklist";
 import { SeedProgressButton } from "@/components/progress/SeedProgressButton";
+import { HintBox } from "@/components/ui/HintBox";
 import { getSite } from "@/lib/sites";
 import { getProgressItems } from "@/lib/progress-checklist";
 import { getProfile } from "@/lib/auth";
@@ -33,21 +34,30 @@ export default async function SiteProgressPage({
         backLabel="現場に戻る"
       />
 
-      {items.length === 0 ? (
-        <section className="space-y-6">
-          <p className="text-lg leading-relaxed text-gray-600">
-            チェック項目がまだありません。下のボタンで標準の工事進行表を作成できます。
+      <HintBox>
+        工程は一覧から選んで追加（スマホはタップ、PCはドラッグでも可）。作業後は〇（完了）または△（注意）を押し、最後に備考を書けます。
+      </HintBox>
+
+      {profile ? (
+        <ProgressChecklist
+          items={items}
+          projectId={id}
+          companyId={profile.company_id}
+          initialRemarks={site.progress_remarks ?? ""}
+        />
+      ) : null}
+
+      {items.length === 0 && profile ? (
+        <section className="mt-8 space-y-4">
+          <p className="text-base text-gray-600">
+            まとめて入れたいときは、標準の工事進行表を一括作成できます。
           </p>
-          {profile ? (
-            <SeedProgressButton
-              projectId={id}
-              companyId={profile.company_id}
-            />
-          ) : null}
+          <SeedProgressButton
+            projectId={id}
+            companyId={profile.company_id}
+          />
         </section>
-      ) : (
-        <ProgressChecklist items={items} projectId={id} />
-      )}
+      ) : null}
     </>
   );
 }

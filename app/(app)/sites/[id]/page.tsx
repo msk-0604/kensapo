@@ -128,6 +128,12 @@ export default async function SiteDetailPage({
             </dd>
           </div>
           <div>
+            <dt className="font-bold text-gray-600">元請け先</dt>
+            <dd className="mt-1 text-lg text-navy-950">
+              {site.prime_contractor_name || "未設定"}
+            </dd>
+          </div>
+          <div>
             <dt className="font-bold text-gray-600">工期</dt>
             <dd className="mt-1 text-lg text-navy-950">
               {formatDate(site.start_date)} 〜 {formatDate(site.end_date)}
