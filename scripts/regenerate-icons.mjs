@@ -10,6 +10,48 @@ const SOURCES = [
   path.join(ROOT, "app", "icon.png"),
 ];
 
+/** 白背景向け: 黒→白、白アイコン→紺。青枠・緑チェックは残す */
+async function toLightBackground(logoPng) {
+  const { data, info } = await sharp(logoPng)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  for (let i = 0; i < data.length; i += info.channels) {
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+
+    // 黒〜暗い背景 → 白
+    if (r < 45 && g < 45 && b < 45) {
+      data[i] = 255;
+      data[i + 1] = 255;
+      data[i + 2] = 255;
+      continue;
+    }
+
+    // 白〜明るいアイコン（ヘルメット・カレンダー）→ 紺
+    if (r > 200 && g > 200 && b > 200) {
+      data[i] = 26;
+      data[i + 1] = 39;
+      data[i + 2] = 68;
+      continue;
+    }
+
+    // 青枠・緑チェックはそのまま
+  }
+
+  return sharp(data, {
+    raw: {
+      width: info.width,
+      height: info.height,
+      channels: info.channels,
+    },
+  })
+    .png()
+    .toBuffer();
+}
+
 async function extractIconFromSource(input) {
   const { data, info } = await sharp(input)
     .ensureAlpha()
@@ -78,19 +120,25 @@ async function buildSquareIcon(size, logo) {
   return sharp(logo)
     .resize(size, size, {
       fit: "contain",
-      background: { r: 0, g: 0, b: 0, alpha: 1 },
+      background: { r: 255, g: 255, b: 255, alpha: 1 },
     })
+    .flatten({ background: { r: 255, g: 255, b: 255 } })
     .png()
     .toBuffer();
 }
 
 async function main() {
-  const input = SOURCES.find((candidate) => fs.existsSync(candidate));
+  // 元ロゴは黒背景版を優先（色変換の元になる）
+  const input = [
+    path.join(ROOT, "scripts", "logo-original.jpg"),
+    path.join(ROOT, "scripts", "logo-source.png"),
+  ].find((candidate) => fs.existsSync(candidate));
   if (!input) {
     throw new Error("Icon source image not found.");
   }
 
-  const logo = await extractIconFromSource(input);
+  const cropped = await extractIconFromSource(input);
+  const logo = await toLightBackground(cropped);
   fs.mkdirSync(path.join(ROOT, "scripts"), { recursive: true });
   fs.writeFileSync(path.join(ROOT, "scripts", "logo-source.png"), logo);
 
@@ -119,6 +167,7 @@ async function main() {
     "favicon.ico",
     fs.statSync(path.join(ROOT, "app", "favicon.ico")).size
   );
+  console.log("background: white / icon: navy");
 }
 
 main().catch((error) => {
