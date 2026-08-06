@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import { ActionHint } from "@/components/ui/ActionHint";
 
+const REMARKS_MAX = 2000;
+
 type GroupedItems = {
   category: string;
   sections: { section: string | null; items: ProjectProgressItem[] }[];
@@ -23,6 +25,7 @@ function groupItems(items: ProjectProgressItem[]): GroupedItems[] {
   >();
 
   for (const item of items) {
+    if (!item?.id || !item.item_name) continue;
     if (!categoryMap.has(item.category)) {
       categoryMap.set(item.category, new Map());
     }
@@ -45,10 +48,28 @@ function itemKey(category: string, section: string | null, name: string) {
   return `${category}::${section ?? ""}::${name}`;
 }
 
-function markToStatus(mark: ProgressMark): ProjectProgressItem["status"] {
-  if (mark === "ok") return "completed";
-  if (mark === "attention") return "attention";
-  return "pending";
+function normalizeMark(value: unknown, checked?: boolean): ProgressMark {
+  if (value === "ok" || value === "attention" || value === "none") return value;
+  return checked ? "ok" : "none";
+}
+
+function friendlyDbError(message: string): string {
+  const m = message.toLowerCase();
+  if (
+    m.includes("mark") ||
+    m.includes("progress_remarks") ||
+    m.includes("prime_contractor") ||
+    m.includes("column")
+  ) {
+    return "データベースの更新が必要です。supabase/RUN_CUSTOMER_WORKFLOW.sql を実行してください。";
+  }
+  if (m.includes("check") || m.includes("constraint")) {
+    return "保存内容が正しくありません。空欄のまま保存できる項目は空欄でも大丈夫です。もう一度お試しください。";
+  }
+  if (m.includes("network") || m.includes("fetch")) {
+    return "通信に失敗しました。電波を確認して、もう一度お試しください。";
+  }
+  return message || "保存に失敗しました。もう一度お試しください。";
 }
 
 export function ProgressChecklist({
@@ -65,15 +86,26 @@ export function ProgressChecklist({
   showPercent?: boolean;
 }) {
   const router = useRouter();
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState(() =>
+    (initialItems ?? []).map((item) => ({
+      ...item,
+      mark: normalizeMark(item.mark, item.checked),
+      remarks: item.remarks ?? null,
+    }))
+  );
   const [savingId, setSavingId] = useState<string | null>(null);
-  const [remarks, setRemarks] = useState(initialRemarks);
+  const [remarks, setRemarks] = useState(initialRemarks ?? "");
   const [remarksSaving, setRemarksSaving] = useState(false);
+  const [remarksMessage, setRemarksMessage] = useState("");
   const [addingKey, setAddingKey] = useState<string | null>(null);
   const [dropActive, setDropActive] = useState(false);
+  const [bannerError, setBannerError] = useState("");
 
-  const completed = items.filter((i) => i.mark === "ok" || i.checked).length;
-  const attention = items.filter((i) => i.mark === "attention").length;
+  const completed = items.filter((i) => normalizeMark(i.mark, i.checked) === "ok")
+    .length;
+  const attention = items.filter(
+    (i) => normalizeMark(i.mark, i.checked) === "attention"
+  ).length;
   const percent =
     items.length > 0 ? Math.round((completed / items.length) * 100) : 0;
 
@@ -88,41 +120,61 @@ export function ProgressChecklist({
   const palette = useMemo(
     () =>
       STANDARD_PROGRESS_ITEMS.filter(
-        (p) => !existingKeys.has(itemKey(p.category, p.section, p.item_name))
+        (p) =>
+          p.item_name.trim() &&
+          !existingKeys.has(itemKey(p.category, p.section, p.item_name))
       ),
     [existingKeys]
   );
 
   async function setMark(item: ProjectProgressItem, mark: ProgressMark) {
+    if (savingId) return;
+    setBannerError("");
     setSavingId(item.id);
     const supabase = createClient();
     const now = new Date().toISOString();
-    const nextMark = item.mark === mark ? "none" : mark;
+    const current = normalizeMark(item.mark, item.checked);
+    const nextMark: ProgressMark = current === mark ? "none" : mark;
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id ?? null;
     const checked = nextMark === "ok";
 
-    const { error } = await supabase
+    // status は pending / completed のみ（古い制約でも△が落ちないように）
+    const basePayload = {
+      checked,
+      checked_at: checked ? now : null,
+      checked_by: checked ? userId : null,
+      updated_at: now,
+      status: checked ? ("completed" as const) : ("pending" as const),
+      mark: nextMark,
+    };
+
+    let { error } = await supabase
       .from("project_progress_items")
-      .update({
-        mark: nextMark,
-        status: markToStatus(nextMark),
-        checked,
-        checked_at: checked ? now : null,
-        checked_by: checked ? userId : null,
-        updated_at: now,
-      })
+      .update(basePayload)
       .eq("id", item.id);
 
-    setSavingId(null);
+    // mark 列が無い／制約エラー時は従来の checked だけ更新
     if (error) {
-      window.alert(
-        error.message.includes("mark")
-          ? "データベース更新が必要です。supabase/RUN_CUSTOMER_WORKFLOW.sql を実行してください。"
-          : error.message
-      );
-      return;
+      const fallback = await supabase
+        .from("project_progress_items")
+        .update({
+          checked,
+          checked_at: checked ? now : null,
+          checked_by: checked ? userId : null,
+          updated_at: now,
+          status: checked ? "completed" : "pending",
+        })
+        .eq("id", item.id);
+      error = fallback.error;
+      if (error) {
+        setSavingId(null);
+        setBannerError(friendlyDbError(error.message));
+        return;
+      }
     }
+
+    setSavingId(null);
 
     const label =
       nextMark === "ok" ? "〇" : nextMark === "attention" ? "△" : "未入力";
@@ -139,7 +191,7 @@ export function ProgressChecklist({
           ? {
               ...i,
               mark: nextMark,
-              status: markToStatus(nextMark),
+              status: checked ? "completed" : "pending",
               checked,
               checked_at: checked ? now : null,
             }
@@ -154,32 +206,50 @@ export function ProgressChecklist({
     section: string | null;
     item_name: string;
   }) {
-    const key = itemKey(process.category, process.section, process.item_name);
-    if (existingKeys.has(key)) return;
+    const name = process.item_name?.trim();
+    if (!name || !companyId || !projectId) return;
+
+    const key = itemKey(process.category, process.section, name);
+    if (existingKeys.has(key) || addingKey) return;
+
+    setBannerError("");
     setAddingKey(key);
     const supabase = createClient();
     const sortOrder =
-      items.reduce((max, i) => Math.max(max, i.sort_order), -1) + 1;
+      items.reduce((max, i) => Math.max(max, i.sort_order ?? 0), -1) + 1;
 
-    const { data, error } = await supabase
+    const fullRow = {
+      company_id: companyId,
+      project_id: projectId,
+      category: process.category || "その他",
+      section: process.section,
+      item_name: name,
+      sort_order: sortOrder,
+      mark: "none" as const,
+      status: "pending" as const,
+      checked: false,
+    };
+
+    let { data, error } = await supabase
       .from("project_progress_items")
-      .insert({
-        company_id: companyId,
-        project_id: projectId,
-        category: process.category,
-        section: process.section,
-        item_name: process.item_name,
-        sort_order: sortOrder,
-        mark: "none",
-        status: "pending",
-        checked: false,
-      })
+      .insert(fullRow)
       .select("*")
       .single();
 
+    if (error) {
+      const { mark: _m, ...withoutMark } = fullRow;
+      const retry = await supabase
+        .from("project_progress_items")
+        .insert(withoutMark)
+        .select("*")
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
+
     setAddingKey(null);
     if (error || !data) {
-      window.alert(error?.message || "工程の追加に失敗しました");
+      setBannerError(friendlyDbError(error?.message || "工程の追加に失敗しました"));
       return;
     }
 
@@ -187,7 +257,7 @@ export function ProgressChecklist({
       ...prev,
       {
         ...data,
-        mark: data.mark ?? "none",
+        mark: normalizeMark(data.mark, data.checked),
         remarks: data.remarks ?? null,
       } as ProjectProgressItem,
     ]);
@@ -195,21 +265,27 @@ export function ProgressChecklist({
   }
 
   async function saveRemarks() {
+    if (remarksSaving) return;
+    setBannerError("");
+    setRemarksMessage("");
     setRemarksSaving(true);
     const supabase = createClient();
+    const value = remarks.trim().slice(0, REMARKS_MAX);
+
     const { error } = await supabase
       .from("projects")
-      .update({ progress_remarks: remarks.trim() || null })
+      .update({ progress_remarks: value.length > 0 ? value : null })
       .eq("id", projectId);
+
     setRemarksSaving(false);
     if (error) {
-      window.alert(
-        error.message.includes("progress_remarks")
-          ? "データベース更新が必要です。supabase/RUN_CUSTOMER_WORKFLOW.sql を実行してください。"
-          : error.message
-      );
+      setBannerError(friendlyDbError(error.message));
       return;
     }
+    setRemarks(value);
+    setRemarksMessage(
+      value.length > 0 ? "備考を保存しました" : "備考を空欄で保存しました"
+    );
     router.refresh();
   }
 
@@ -217,6 +293,12 @@ export function ProgressChecklist({
 
   return (
     <div className="space-y-8">
+      {bannerError ? (
+        <p className="rounded-2xl border-2 border-red-200 bg-red-50 px-4 py-3 text-lg text-red-700">
+          {bannerError}
+        </p>
+      ) : null}
+
       {showPercent ? (
         <section className="rounded-2xl border-2 border-navy-900 bg-navy-900 p-5 text-center text-white">
           <p className="text-base font-bold opacity-90">工事進行状況</p>
@@ -256,9 +338,9 @@ export function ProgressChecklist({
               section: string | null;
               item_name: string;
             };
-            void addProcess(process);
+            if (process?.item_name?.trim()) void addProcess(process);
           } catch {
-            // ignore
+            // ignore bad drag payload
           }
         }}
       >
@@ -286,47 +368,50 @@ export function ProgressChecklist({
                       </h4>
                     ) : null}
                     <ul className="space-y-3">
-                      {sec.items.map((item) => (
-                        <li
-                          key={item.id}
-                          className="rounded-2xl border-2 border-gray-200 bg-white p-4"
-                        >
-                          <p className="text-xl font-bold text-navy-950">
-                            {item.item_name}
-                          </p>
-                          <div className="mt-3 grid grid-cols-2 gap-3">
-                            <button
-                              type="button"
-                              disabled={savingId === item.id}
-                              onClick={() => void setMark(item, "ok")}
-                              className={cn(
-                                "tap-press min-h-[4.5rem] rounded-2xl border-2 text-3xl font-bold",
-                                item.mark === "ok"
-                                  ? "border-green-600 bg-green-600 text-white"
-                                  : "border-green-300 bg-green-50 text-green-800"
-                              )}
-                            >
-                              〇
-                            </button>
-                            <button
-                              type="button"
-                              disabled={savingId === item.id}
-                              onClick={() => void setMark(item, "attention")}
-                              className={cn(
-                                "tap-press min-h-[4.5rem] rounded-2xl border-2 text-3xl font-bold",
-                                item.mark === "attention"
-                                  ? "border-amber-500 bg-amber-500 text-white"
-                                  : "border-amber-300 bg-amber-50 text-amber-800"
-                              )}
-                            >
-                              △
-                            </button>
-                          </div>
-                          <ActionHint>
-                            〇＝完了　△＝注意・未完了　もう一度押すと取り消せます
-                          </ActionHint>
-                        </li>
-                      ))}
+                      {sec.items.map((item) => {
+                        const mark = normalizeMark(item.mark, item.checked);
+                        return (
+                          <li
+                            key={item.id}
+                            className="rounded-2xl border-2 border-gray-200 bg-white p-4"
+                          >
+                            <p className="text-xl font-bold text-navy-950">
+                              {item.item_name}
+                            </p>
+                            <div className="mt-3 grid grid-cols-2 gap-3">
+                              <button
+                                type="button"
+                                disabled={savingId === item.id}
+                                onClick={() => void setMark(item, "ok")}
+                                className={cn(
+                                  "tap-press min-h-[4.5rem] rounded-2xl border-2 text-3xl font-bold",
+                                  mark === "ok"
+                                    ? "border-green-600 bg-green-600 text-white"
+                                    : "border-green-300 bg-green-50 text-green-800"
+                                )}
+                              >
+                                〇
+                              </button>
+                              <button
+                                type="button"
+                                disabled={savingId === item.id}
+                                onClick={() => void setMark(item, "attention")}
+                                className={cn(
+                                  "tap-press min-h-[4.5rem] rounded-2xl border-2 text-3xl font-bold",
+                                  mark === "attention"
+                                    ? "border-amber-500 bg-amber-500 text-white"
+                                    : "border-amber-300 bg-amber-50 text-amber-800"
+                                )}
+                              >
+                                △
+                              </button>
+                            </div>
+                            <ActionHint>
+                              〇＝完了　△＝注意・未完了　もう一度押すと取り消せます
+                            </ActionHint>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 ))}
@@ -386,10 +471,13 @@ export function ProgressChecklist({
       <section className="rounded-2xl border-2 border-gray-200 bg-white p-4">
         <h2 className="mb-3 text-lg font-bold text-navy-950">備考</h2>
         <Textarea
-          label="詳細・申し送り（任意）"
+          label="詳細・申し送り（任意・空欄でも保存できます）"
           value={remarks}
-          onChange={(e) => setRemarks(e.target.value)}
+          onChange={(e) =>
+            setRemarks(e.target.value.slice(0, REMARKS_MAX))
+          }
           rows={4}
+          maxLength={REMARKS_MAX}
           placeholder="例：明日は資材搬入あり。△の箇所は要再確認。"
         />
         <div className="mt-4">
@@ -401,7 +489,12 @@ export function ProgressChecklist({
           >
             備考を保存する
           </Button>
-          <ActionHint>最後に気づいたことを書いておけます</ActionHint>
+          <ActionHint>空欄のまま保存してもエラーになりません</ActionHint>
+          {remarksMessage ? (
+            <p className="mt-3 text-center text-base font-bold text-green-700">
+              {remarksMessage}
+            </p>
+          ) : null}
         </div>
       </section>
     </div>

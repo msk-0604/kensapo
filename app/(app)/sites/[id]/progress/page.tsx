@@ -43,9 +43,13 @@ export default async function SiteProgressPage({
           items={items}
           projectId={id}
           companyId={profile.company_id}
-          initialRemarks={site.progress_remarks ?? ""}
+          initialRemarks={site.progress_remarks?.trim() ?? ""}
         />
-      ) : null}
+      ) : (
+        <p className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-lg text-amber-900">
+          ログイン情報を確認できませんでした。一度ログアウトして、もう一度ログインしてください。
+        </p>
+      )}
 
       {items.length === 0 && profile ? (
         <section className="mt-8 space-y-4">

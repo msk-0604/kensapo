@@ -53,20 +53,45 @@ export function ProjectForm({ project, successHref }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    const name = form.name.trim();
+    if (!name) {
+      setError("現場の名前を入力してください");
+      return;
+    }
+
+    if (
+      form.start_date &&
+      form.end_date &&
+      form.start_date > form.end_date
+    ) {
+      setError("完了予定日は着工日と同じか、それより後にしてください");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const controller = new AbortController();
       const timer = window.setTimeout(() => controller.abort(), 20000);
 
+      const payload = {
+        name,
+        address: form.address.trim(),
+        manager_name: form.manager_name.trim(),
+        prime_contractor_name: form.prime_contractor_name.trim(),
+        start_date: form.start_date || "",
+        end_date: form.end_date || "",
+        status: form.status,
+        memo: form.memo.trim(),
+      };
+
       const res = await fetch("/api/projects", {
         method: project ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
         body: JSON.stringify(
-          project
-            ? { id: project.id, ...form }
-            : form
+          project ? { id: project.id, ...payload } : payload
         ),
       }).finally(() => window.clearTimeout(timer));
 
@@ -75,12 +100,14 @@ export function ProjectForm({ project, successHref }: Props) {
         | null;
 
       if (!res.ok || !data?.id) {
-        throw new Error(data?.error || "保存に失敗しました。もう一度お試しください。");
+        throw new Error(
+          data?.error || "保存に失敗しました。もう一度お試しください。"
+        );
       }
 
       void notifyCompanyUpdate({
         title: project ? "現場情報を更新しました" : "新しい現場が登録されました",
-        body: project ? `${form.name} の内容が変更されました` : form.name,
+        body: project ? `${name} の内容が変更されました` : name,
         url: `/sites/${data.id}`,
         tag: `site-${data.id}`,
       });
@@ -89,7 +116,9 @@ export function ProjectForm({ project, successHref }: Props) {
       router.refresh();
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
-        setError("保存がタイムアウトしました。通信状況を確認して、もう一度お試しください。");
+        setError(
+          "保存がタイムアウトしました。通信状況を確認して、もう一度お試しください。"
+        );
       } else {
         setError(err instanceof Error ? err.message : "保存に失敗しました");
       }
@@ -118,11 +147,15 @@ export function ProjectForm({ project, successHref }: Props) {
         onChange={(e) => update("manager_name", e.target.value)}
       />
       <Input
-        label="元請け先名"
+        label="元請け先名（任意）"
         value={form.prime_contractor_name}
         onChange={(e) => update("prime_contractor_name", e.target.value)}
+        maxLength={200}
         placeholder="例：○○建設株式会社"
       />
+      <p className="-mt-4 text-base text-gray-500">
+        空欄のまま登録しても問題ありません
+      </p>
       <div className="grid grid-cols-2 gap-3">
         <Input
           label="着工日"

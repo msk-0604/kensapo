@@ -168,6 +168,8 @@ export async function seedStandardProgressItems(
     section: item.section,
     item_name: item.item_name,
     sort_order: index,
+    status: "pending",
+    checked: false,
   }));
 
   const { error } = await supabase.from("project_progress_items").insert(rows);

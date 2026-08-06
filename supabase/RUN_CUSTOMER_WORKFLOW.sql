@@ -31,3 +31,19 @@ SET mark = 'ok',
     status = 'completed'
 WHERE checked = true
   AND (mark IS NULL OR mark = 'none');
+
+-- 空・不正な mark を安全な値に揃える
+UPDATE project_progress_items
+SET mark = 'none'
+WHERE mark IS NULL
+   OR mark NOT IN ('none', 'ok', 'attention');
+
+UPDATE project_progress_items
+SET status = 'pending'
+WHERE status IS NULL
+   OR status NOT IN ('pending', 'completed', 'attention');
+
+-- attention は mark 側で持つ想定のため、status に残っていても致命傷にしない
+UPDATE project_progress_items
+SET status = 'pending'
+WHERE status = 'attention' AND (mark IS NULL OR mark = 'none');
