@@ -7,6 +7,7 @@ import { getProfile } from "@/lib/auth";
 export default async function NewSitePage() {
   const profile = await getProfile();
   if (!profile) redirect("/login");
+  if (profile.role !== "admin") redirect("/sites");
 
   return (
     <>
@@ -17,7 +18,7 @@ export default async function NewSitePage() {
         backLabel="現場一覧に戻る"
       />
       <HintBox>
-        現場の名前と住所を入力すれば、すぐに写真や日報の記録を始められます。
+        管理者が現場を登録したあと、工事進行ページで作業工程を作成すると運用を開始できます。
       </HintBox>
       <ProjectForm companyId={profile.company_id} />
     </>

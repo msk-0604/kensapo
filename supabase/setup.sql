@@ -306,15 +306,37 @@ CREATE POLICY "projects_insert" ON projects
   WITH CHECK (
     company_id = public.get_my_company_id()
     AND company_id IS NOT NULL
+    AND EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+        AND p.company_id = projects.company_id
+        AND p.role = 'admin'
+    )
   );
 
 DROP POLICY IF EXISTS "projects_update" ON projects;
 CREATE POLICY "projects_update" ON projects
-  FOR UPDATE USING (company_id = public.get_my_company_id());
+  FOR UPDATE USING (
+    company_id = public.get_my_company_id()
+    AND EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+        AND p.company_id = projects.company_id
+        AND p.role = 'admin'
+    )
+  );
 
 DROP POLICY IF EXISTS "projects_delete" ON projects;
 CREATE POLICY "projects_delete" ON projects
-  FOR DELETE USING (company_id = public.get_my_company_id());
+  FOR DELETE USING (
+    company_id = public.get_my_company_id()
+    AND EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+        AND p.company_id = projects.company_id
+        AND p.role = 'admin'
+    )
+  );
 
 -- =============================================================================
 -- RLS policies: site_photos
@@ -467,7 +489,15 @@ CREATE POLICY "progress_items_select" ON project_progress_items
 
 DROP POLICY IF EXISTS "progress_items_insert" ON project_progress_items;
 CREATE POLICY "progress_items_insert" ON project_progress_items
-  FOR INSERT WITH CHECK (company_id = public.get_my_company_id());
+  FOR INSERT WITH CHECK (
+    company_id = public.get_my_company_id()
+    AND EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+        AND p.company_id = project_progress_items.company_id
+        AND p.role = 'admin'
+    )
+  );
 
 DROP POLICY IF EXISTS "progress_items_update" ON project_progress_items;
 CREATE POLICY "progress_items_update" ON project_progress_items
@@ -475,7 +505,15 @@ CREATE POLICY "progress_items_update" ON project_progress_items
 
 DROP POLICY IF EXISTS "progress_items_delete" ON project_progress_items;
 CREATE POLICY "progress_items_delete" ON project_progress_items
-  FOR DELETE USING (company_id = public.get_my_company_id());
+  FOR DELETE USING (
+    company_id = public.get_my_company_id()
+    AND EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+        AND p.company_id = project_progress_items.company_id
+        AND p.role = 'admin'
+    )
+  );
 
 -- =============================================================================
 -- Indexes

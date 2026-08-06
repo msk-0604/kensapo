@@ -78,12 +78,14 @@ export function ProgressChecklist({
   companyId,
   initialRemarks = "",
   showPercent = true,
+  canManageItems = true,
 }: {
   items: ProjectProgressItem[];
   projectId: string;
   companyId: string;
   initialRemarks?: string;
   showPercent?: boolean;
+  canManageItems?: boolean;
 }) {
   const router = useRouter();
   const [items, setItems] = useState(() =>
@@ -318,16 +320,18 @@ export function ProgressChecklist({
       <section
         className={cn(
           "rounded-2xl border-2 border-dashed p-4 transition-colors",
-          dropActive
+          canManageItems && dropActive
             ? "border-navy-900 bg-navy-900/5"
             : "border-gray-300 bg-white"
         )}
         onDragOver={(e) => {
+          if (!canManageItems) return;
           e.preventDefault();
           setDropActive(true);
         }}
         onDragLeave={() => setDropActive(false)}
         onDrop={(e) => {
+          if (!canManageItems) return;
           e.preventDefault();
           setDropActive(false);
           const raw = e.dataTransfer.getData("application/kensapo-process");
@@ -346,7 +350,9 @@ export function ProgressChecklist({
       >
         <h2 className="text-lg font-bold text-navy-950">この現場の作業工程</h2>
         <p className="mt-1 text-base text-gray-600">
-          下の一覧から選んで追加できます。パソコンならドラッグ＆ドロップでも追加できます。
+          {canManageItems
+            ? "下の一覧から選んで追加できます。パソコンならドラッグ＆ドロップでも追加できます。"
+            : "管理者が作成した工程に対して、作業者は〇/△で進捗を記録します。"}
         </p>
 
         {items.length === 0 ? (
@@ -421,52 +427,54 @@ export function ProgressChecklist({
         )}
       </section>
 
-      <section className="rounded-2xl border-2 border-gray-200 bg-white p-4">
-        <h2 className="text-lg font-bold text-navy-950">
-          作業工程を追加する
-        </h2>
-        <p className="mt-1 text-base text-gray-600">
-          毎回打たなくて大丈夫です。一覧をタップ（またはドラッグ）して追加します。
-        </p>
-        {palette.length === 0 ? (
-          <p className="mt-4 text-base text-gray-500">
-            追加できる標準工程はすべて入っています。
+      {canManageItems ? (
+        <section className="rounded-2xl border-2 border-gray-200 bg-white p-4">
+          <h2 className="text-lg font-bold text-navy-950">
+            作業工程を追加する（管理者）
+          </h2>
+          <p className="mt-1 text-base text-gray-600">
+            毎回打たなくて大丈夫です。一覧をタップ（またはドラッグ）して追加します。
           </p>
-        ) : (
-          <ul className="mt-4 max-h-80 space-y-2 overflow-y-auto">
-            {palette.map((process) => {
-              const key = itemKey(
-                process.category,
-                process.section,
-                process.item_name
-              );
-              const label = process.section
-                ? `${process.category} / ${process.section} / ${process.item_name}`
-                : `${process.category} / ${process.item_name}`;
-              return (
-                <li key={key}>
-                  <button
-                    type="button"
-                    draggable
-                    disabled={addingKey === key}
-                    onDragStart={(e) => {
-                      e.dataTransfer.setData(
-                        "application/kensapo-process",
-                        JSON.stringify(process)
-                      );
-                      e.dataTransfer.effectAllowed = "copy";
-                    }}
-                    onClick={() => void addProcess(process)}
-                    className="tap-press flex min-h-[3.5rem] w-full items-center rounded-xl border-2 border-gray-200 bg-gray-50 px-4 text-left text-base font-bold text-navy-950 active:bg-navy-900 active:text-white"
-                  >
-                    {addingKey === key ? "追加中…" : `＋ ${label}`}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+          {palette.length === 0 ? (
+            <p className="mt-4 text-base text-gray-500">
+              追加できる標準工程はすべて入っています。
+            </p>
+          ) : (
+            <ul className="mt-4 max-h-80 space-y-2 overflow-y-auto">
+              {palette.map((process) => {
+                const key = itemKey(
+                  process.category,
+                  process.section,
+                  process.item_name
+                );
+                const label = process.section
+                  ? `${process.category} / ${process.section} / ${process.item_name}`
+                  : `${process.category} / ${process.item_name}`;
+                return (
+                  <li key={key}>
+                    <button
+                      type="button"
+                      draggable
+                      disabled={addingKey === key}
+                      onDragStart={(e) => {
+                        e.dataTransfer.setData(
+                          "application/kensapo-process",
+                          JSON.stringify(process)
+                        );
+                        e.dataTransfer.effectAllowed = "copy";
+                      }}
+                      onClick={() => void addProcess(process)}
+                      className="tap-press flex min-h-[3.5rem] w-full items-center rounded-xl border-2 border-gray-200 bg-gray-50 px-4 text-left text-base font-bold text-navy-950 active:bg-navy-900 active:text-white"
+                    >
+                      {addingKey === key ? "追加中…" : `＋ ${label}`}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      ) : null}
 
       <section className="rounded-2xl border-2 border-gray-200 bg-white p-4">
         <h2 className="mb-3 text-lg font-bold text-navy-950">備考</h2>

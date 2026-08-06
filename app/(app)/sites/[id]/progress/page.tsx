@@ -18,6 +18,7 @@ export default async function SiteProgressPage({
   if (!site) notFound();
 
   const profile = await getProfile();
+  const isAdmin = profile?.role === "admin";
   let items: ProjectProgressItem[] = [];
   try {
     items = await getProgressItems(id);
@@ -35,7 +36,9 @@ export default async function SiteProgressPage({
       />
 
       <HintBox>
-        工程は一覧から選んで追加（スマホはタップ、PCはドラッグでも可）。作業後は〇（完了）または△（注意）を押し、最後に備考を書けます。
+        {isAdmin
+          ? "管理者が作業工程（TODO）を作成し、作業者が〇/△で進捗を更新します。最後に備考へ詳細を書けます。"
+          : "管理者が作った作業工程に対して、作業者は〇（完了）か△（途中・注意）を押して進捗を記録します。"}
       </HintBox>
 
       {profile ? (
@@ -44,6 +47,7 @@ export default async function SiteProgressPage({
           projectId={id}
           companyId={profile.company_id}
           initialRemarks={site.progress_remarks?.trim() ?? ""}
+          canManageItems={isAdmin}
         />
       ) : (
         <p className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 text-lg text-amber-900">
@@ -51,7 +55,7 @@ export default async function SiteProgressPage({
         </p>
       )}
 
-      {items.length === 0 && profile ? (
+      {items.length === 0 && profile && isAdmin ? (
         <section className="mt-8 space-y-4">
           <p className="text-base text-gray-600">
             まとめて入れたいときは、標準の工事進行表を一括作成できます。

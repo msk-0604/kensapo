@@ -12,6 +12,7 @@ export default async function EditProjectPage({
   const { id } = await params;
   const profile = await getProfile();
   if (!profile) redirect("/login");
+  if (profile.role !== "admin") redirect(`/sites/${id}`);
 
   const project = await getProject(id);
   if (!project) notFound();

@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { HintBox } from "@/components/ui/HintBox";
 import { WorkerNameList } from "@/components/ui/WorkerNameList";
+import { getProfile } from "@/lib/auth";
 import { getSites } from "@/lib/sites";
 import { getSchedulesForDate, workerNamesByProject } from "@/lib/schedules";
 import { formatDate, todayISO } from "@/lib/utils";
@@ -27,10 +28,12 @@ export default async function SitesPage({
   searchParams: Promise<{ intent?: string }>;
 }) {
   const { intent } = await searchParams;
-  const [sites, todaySchedules] = await Promise.all([
+  const [profile, sites, todaySchedules] = await Promise.all([
+    getProfile(),
     getSites(),
     getSchedulesForDate(todayISO()).catch(() => []),
   ]);
+  const isAdmin = profile?.role === "admin";
   const todayWorkers = workerNamesByProject(todaySchedules);
   const intentMessage = intent ? INTENT_MESSAGES[intent] : null;
 
@@ -46,11 +49,13 @@ export default async function SitesPage({
         backHref="/dashboard"
         backLabel="ホームに戻る"
         action={
-          <Link href="/sites/new">
-            <Button fullWidth size="md">
-              新しい現場を登録する
-            </Button>
-          </Link>
+          isAdmin ? (
+            <Link href="/sites/new">
+              <Button fullWidth size="md">
+                新しい現場を登録する
+              </Button>
+            </Link>
+          ) : undefined
         }
       />
 
@@ -58,6 +63,11 @@ export default async function SitesPage({
         <HintBox>
           <p className="font-bold">{intentMessage.title}</p>
           <p className="mt-1">{intentMessage.body}</p>
+        </HintBox>
+      ) : null}
+      {!isAdmin ? (
+        <HintBox>
+          この画面は作業者用です。現場の新規登録や編集は管理者だけができます。
         </HintBox>
       ) : null}
 
@@ -71,9 +81,11 @@ export default async function SitesPage({
             "登録した現場から、写真や日報を記録する",
           ]}
           action={
-            <Link href="/sites/new">
-              <Button fullWidth>新しい現場を登録する</Button>
-            </Link>
+            isAdmin ? (
+              <Link href="/sites/new">
+                <Button fullWidth>新しい現場を登録する</Button>
+              </Link>
+            ) : undefined
           }
         />
       ) : (

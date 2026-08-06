@@ -52,6 +52,7 @@ export default async function SiteDetailPage({
   const todaySchedules = siteSchedules.filter((s) => s.schedule_date === today);
   const todayWorkers = uniqueWorkerNames(todaySchedules);
   const upcomingWorkers = uniqueWorkerNames(siteSchedules);
+  const isAdmin = profile?.role === "admin";
   const checklistSummary =
     progressItems.length > 0 ? calcProgressSummary(progressItems) : null;
 
@@ -100,7 +101,7 @@ export default async function SiteDetailPage({
             <p className="mb-4 text-base text-gray-600">
               紙の工事進行表をスマホでチェックできます。
             </p>
-            {profile ? (
+            {isAdmin && profile ? (
               <SeedProgressButton
                 projectId={id}
                 companyId={profile.company_id}
@@ -148,13 +149,15 @@ export default async function SiteDetailPage({
             </div>
           ) : null}
         </dl>
-        <div className="mt-6 border-t-2 border-gray-100 pt-5">
-          <Link href={`/sites/${id}/edit`}>
-            <Button variant="secondary" fullWidth size="md">
-              現場の情報を変更する
-            </Button>
-          </Link>
-        </div>
+        {isAdmin ? (
+          <div className="mt-6 border-t-2 border-gray-100 pt-5">
+            <Link href={`/sites/${id}/edit`}>
+              <Button variant="secondary" fullWidth size="md">
+                現場の情報を変更する
+              </Button>
+            </Link>
+          </div>
+        ) : null}
       </Card>
 
       <Card className="mb-8 !p-5">
@@ -208,13 +211,15 @@ export default async function SiteDetailPage({
               </li>
             ))}
           </ul>
-          <div className="mt-4">
-            <Link href="/schedule">
-              <Button variant="secondary" fullWidth size="md">
-                予定を追加・変更する
-              </Button>
-            </Link>
-          </div>
+          {isAdmin ? (
+            <div className="mt-4">
+              <Link href="/schedule">
+                <Button variant="secondary" fullWidth size="md">
+                  予定を追加・変更する
+                </Button>
+              </Link>
+            </div>
+          ) : null}
         </Card>
       ) : (
         <Card className="mb-8 !p-5">
@@ -224,11 +229,17 @@ export default async function SiteDetailPage({
           <p className="mb-4 text-base text-gray-600">
             まだ予定が登録されていません。作業員を割り当てて予定を入れると、ここに名前が表示されます。
           </p>
-          <Link href="/schedule">
-            <Button fullWidth size="md">
-              作業員の予定を登録する
-            </Button>
-          </Link>
+          {isAdmin ? (
+            <Link href="/schedule">
+              <Button fullWidth size="md">
+                作業員の予定を登録する
+              </Button>
+            </Link>
+          ) : (
+            <p className="text-base text-gray-600">
+              予定の登録は管理者が行います。
+            </p>
+          )}
         </Card>
       )}
 

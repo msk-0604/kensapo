@@ -82,6 +82,12 @@ export async function POST(request: Request) {
   if (!user || !profile) {
     return NextResponse.json({ error: "ログインし直してください" }, { status: 401 });
   }
+  if (profile.role !== "admin") {
+    return NextResponse.json(
+      { error: "現場の登録は管理者だけができます" },
+      { status: 403 }
+    );
+  }
 
   let body: Record<string, unknown>;
   try {
@@ -132,6 +138,12 @@ export async function PATCH(request: Request) {
   const { user, profile, supabase } = await requireApiUser();
   if (!user || !profile) {
     return NextResponse.json({ error: "ログインし直してください" }, { status: 401 });
+  }
+  if (profile.role !== "admin") {
+    return NextResponse.json(
+      { error: "現場情報の変更は管理者だけができます" },
+      { status: 403 }
+    );
   }
 
   let body: Record<string, unknown>;
