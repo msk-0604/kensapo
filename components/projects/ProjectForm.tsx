@@ -14,6 +14,8 @@ type Props = {
   companyId: string;
   /** 保存後の移動先（未指定なら現場詳細へ） */
   successHref?: string;
+  /** 新規登録後に工事進行（工程作成）へ進む */
+  goToProgressAfterCreate?: boolean;
 };
 
 const defaultForm = {
@@ -27,7 +29,11 @@ const defaultForm = {
   memo: "",
 };
 
-export function ProjectForm({ project, successHref }: Props) {
+export function ProjectForm({
+  project,
+  successHref,
+  goToProgressAfterCreate,
+}: Props) {
   const router = useRouter();
   const [form, setForm] = useState(
     project
@@ -112,7 +118,12 @@ export function ProjectForm({ project, successHref }: Props) {
         tag: `site-${data.id}`,
       });
 
-      router.replace(successHref ?? `/sites/${data.id}`);
+      const nextHref = project
+        ? successHref ?? `/sites/${data.id}`
+        : goToProgressAfterCreate
+          ? `/sites/${data.id}/progress`
+          : successHref ?? `/sites/${data.id}`;
+      router.replace(nextHref);
       router.refresh();
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") {
